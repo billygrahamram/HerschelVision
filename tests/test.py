@@ -165,9 +165,7 @@ class App(ctk.CTk):
             image=self.resized_tk)
         
     def about(self):
-        
         # creates a new top level tkinter window.
-        
         self.about_window = tk.Toplevel(self)
         self.about_window.title("About")
         self.about_window.geometry("500x500")
@@ -199,6 +197,8 @@ class App(ctk.CTk):
         
         self.canvas.pack(expand=True, fill='both')
         self.canvas.bind('<Configure>',self.full_image)
+        
+        
         
 
 app = App()
