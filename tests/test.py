@@ -80,17 +80,10 @@ class App(ctk.CTk):
     
         ## children to main window
         self.menuBarFrame = frame(master = self, side = 'top', border_width=0 ,fill = 'x', expand=False, fg_color='white')
-        self.workMenuFrame = frame(master = self, side = 'top', border_width=0,fill = 'both', expand= True, fg_color='white')
+        self.workAreaFrame = frame(master = self, side = 'top', border_width=0,fill = 'both', expand= True, fg_color='white')
         
-        
-        ## children to workMenuFrame 
-        self.leftFrame = frame(master=self.workMenuFrame, side='left', border_width= 20)
-        self.rightFrame = frame(master=self.workMenuFrame, side='right', border_width= 20)
-        
-        
-        ## children to righFrame
-        self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
-        self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
+        # opens the home window by default
+        self.homeWindow()
         
         ## children to menuBarFrame. Menu bar buttons
         self.optionmenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["New","Open","Save","Export","Exit"], command=self.optionmenu_callback)
@@ -101,7 +94,7 @@ class App(ctk.CTk):
         self.optionmenu.set("Edit")
         self.optionmenu.pack(side= 'left',padx=5, pady=5)
         
-        self.optionmenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Segmentation","Preprocessing"], command=self.optionmenu_callback)
+        self.optionmenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Preliminary Analysis","Segmentation","Preprocessing"], command=self.optionmenu_callback)
         self.optionmenu.set("Tools")
         self.optionmenu.pack(side= 'left',padx=5, pady=5)
 
@@ -119,8 +112,26 @@ class App(ctk.CTk):
             self.open()
         elif choice == 'About':
             self.about()
+        elif choice == 'Segmentation':
+            self.segmentation()
+        elif choice == 'Preliminary Analysis':
+            self.homeWindow()
 
-       
+    
+    def homeWindow(self):
+        # Clear self.workAreaFrame
+        for widget in self.workAreaFrame.winfo_children():
+            widget.destroy()
+            
+        ## children to workMenuFrame 
+        self.leftFrame = frame(master=self.workAreaFrame, side='left', border_width= 20)
+        self.rightFrame = frame(master=self.workAreaFrame, side='right', border_width= 20)
+        
+        
+        ## children to righFrame
+        self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
+        self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
+    
     def open(self):
         file_path = tk.filedialog.askopenfilename(initialdir="/", 
                                                 title="Select file",
@@ -198,9 +209,57 @@ class App(ctk.CTk):
         self.canvas.pack(expand=True, fill='both')
         self.canvas.bind('<Configure>',self.full_image)
         
+    def segmentation(self):
         
+        # Clear self.workAreaFrame
+        for widget in self.workAreaFrame.winfo_children():
+            widget.destroy()
         
+                ## children to workMenuFrame 
+        self.leftFrame = frame(master=self.workAreaFrame, side='left', border_width= 20,fg_color='white')
+        self.middleFrame = frame(master=self.workAreaFrame, side='left', border_width= 20,fg_color='red')
+        self.rightFrame = frame(master=self.workAreaFrame, side='left', border_width= 20,fg_color='green')
+        
+                ## children to righFrame
+        self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green', height = 1000)
+        self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green', height = 10)
+        
+        self.rightFrameBottom.columnconfigure(0, weight=1)
+        self.rightFrameBottom.columnconfigure(1, weight=1)
+        self.rightFrameBottom.rowconfigure(0, weight=1)
+        
+        self.saveImageasNPYButton(master = self.rightFrameBottom)
+        self.saveUnfoldimgButton(master = self.rightFrameBottom)
 
+
+    def saveImageasNPYButton(self, master):
+        self.saveImageasNPYButton = ctk.CTkButton(master=master,
+                                                    text='Save Image as NPY (3D array)',
+                                                    fg_color='red',
+                                                    bg_color='white',
+                                                    hover = True,
+                                                    corner_radius=100,
+                                                    border_width=5,
+                                                    border_color='red',
+                                                    command=button_event)
+
+        self.saveImageasNPYButton.grid(row = 0, column =0, sticky='ew')
+        
+        
+    def saveUnfoldimgButton(self, master):
+        self.saveUnfoldimgButton = ctk.CTkButton(master=master,
+                                                    text='Save Unfold Image (.txt)',
+                                                    fg_color='red',
+                                                    bg_color='white',
+                                                    hover = True,
+                                                    corner_radius=100,
+                                                    border_width=5,
+                                                    border_color='red',
+                                                    command=button_event)
+        self.saveUnfoldimgButton.grid(row = 0, column =1, sticky='ew')
+        
+        
+        
 app = App()
 app.mainloop()
 
