@@ -1,9 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
-
-import numpy as np
 from PIL import Image, ImageTk
-import matplotlib.pyplot as plt
+
 
 
 
@@ -80,32 +78,31 @@ class App(ctk.CTk):
     
         ## children to main window
         self.menuBarFrame = frame(master = self, side = 'top', border_width=0 ,fill = 'x', expand=False, fg_color='white')
-        self.workMenuFrame = frame(master = self, side = 'top', border_width=0,fill = 'both', expand= True, fg_color='white')
+        self.workAreaFrame = frame(master = self, side = 'top', border_width=0,fill = 'both', expand= True, fg_color='white')
         
-        
-        ## children to workMenuFrame 
-        self.leftFrame = frame(master=self.workMenuFrame, side='left', border_width= 20)
-        self.rightFrame = frame(master=self.workMenuFrame, side='right', border_width= 20)
-        
-        
-        ## children to righFrame
-        self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
-        self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
-        
+        # opens the home window by default
+        self.homeWindow()
+        self.mainMenu()
+    
+
+
+    def mainMenu(self):
         ## children to menuBarFrame. Menu bar buttons
-        self.optionmenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["New","Open","Save","Export","Exit"], command=self.optionmenu_callback)
-        self.optionmenu.set("File")
-        self.optionmenu.pack(side= 'left',padx=5, pady=5)
+        self.FileOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["New","Open","Save","Export","Exit"], command=self.optionmenu_callback)
+        self.FileOptionMenu.set("File")
+        self.FileOptionMenu.pack(side= 'left',padx=5, pady=5)
         
-        self.optionmenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Preferences","Undo"], command=self.optionmenu_callback)
-        self.optionmenu.set("Edit")
-        self.optionmenu.pack(side= 'left',padx=5, pady=5)
+        self.EditOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Preferences","Undo"], command=self.optionmenu_callback)
+        self.EditOptionMenu.set("Edit")
+        self.EditOptionMenu.pack(side= 'left',padx=5, pady=5)
+        
+        self.ToolsOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Preliminary Analysis","Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
+        self.ToolsOptionMenu.set("Tools")
+        self.ToolsOptionMenu.pack(side= 'left',padx=5, pady=5)
 
-        self.optionmenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Updates","Version","About", "Contact us"], command=self.optionmenu_callback)
-        self.optionmenu.set("About")
-        self.optionmenu.pack(side= 'left',padx=5, pady=5)
-
-
+        self.AboutOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Updates","Version","About", "Contact us"], command=self.optionmenu_callback)
+        self.AboutOptionMenu.set("About")
+        self.AboutOptionMenu.pack(side= 'left',padx=5, pady=5)
        
     def optionmenu_callback(self,choice):
     
@@ -113,8 +110,30 @@ class App(ctk.CTk):
             app.destroy()
         elif choice == 'Open':
             self.open()
+        elif choice == 'About':
+            self.about()
+        elif choice == 'Segmentation':
+            self.greenboard()
+        elif choice == 'Preliminary Analysis':
+            self.homeWindow()
+        elif choice == 'Preprocessing':
+            self.greenboard()
 
-       
+    
+    def homeWindow(self):
+        # Clear self.workAreaFrame
+        for widget in self.workAreaFrame.winfo_children():
+            widget.destroy()
+            
+        ## children to workMenuFrame 
+        self.leftFrame = frame(master=self.workAreaFrame, side='left', border_width= 20)
+        self.rightFrame = frame(master=self.workAreaFrame, side='right', border_width= 20)
+        
+        
+        ## children to righFrame
+        self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
+        self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
+    
     def open(self):
         file_path = tk.filedialog.askopenfilename(initialdir="/", 
                                                 title="Select file",
@@ -158,7 +177,91 @@ class App(ctk.CTk):
             anchor = 'center',
             image=self.resized_tk)
         
-    
+    def about(self):
+            
+        # creates a new top level tkinter window.
+        self.about_window = ctk.CTkToplevel(self)
+        self.about_window.title("About")
+        self.about_window.geometry("400x400")
+        self.about_window.resizable(width=False, height=False)
+
+
+        # routes all event for the app to about window.
+        # user cannot intereact with app until about window is closed.
+        self.about_window.grab_set()
+        
+        # makes the popup window appear on top of the application window
+        # instead of a seperate desktop window.
+        self.about_window.attributes('-topmost', True)
+        self.about_window.after_idle(self.about_window.attributes, '-topmost', False)
+        
+        self.img_original = Image.open('data/HerschelVisionAbout.png')
+        self.img_ratio = self.img_original.size[0]/self.img_original.size[1]
+        self.img_tk = ImageTk.PhotoImage(self.img_original)
+        
+        self.canvas = tk.Canvas(master = self.about_window,
+                                background = "black",
+                                bd = 0,
+                                highlightthickness = 0,
+                                relief = 'ridge'
+                                )
+        
+        self.canvas.pack(expand=True, fill='both')
+        self.canvas.bind('<Configure>',self.full_image)
+        
+
+        
+    def greenboard(self):
+        
+        # Clear self.workAreaFrame
+        for widget in self.workAreaFrame.winfo_children():
+            widget.destroy()
+        
+        ## children to workMenuFrame 
+        self.leftFrame = frame(master=self.workAreaFrame, side='left', border_width= 20,fg_color='white')
+        self.middleFrame = frame(master=self.workAreaFrame, side='left', border_width= 20,fg_color='red')
+        self.rightFrame = frame(master=self.workAreaFrame, side='left', border_width= 20,fg_color='green')
+        
+        ## children to righFrame
+        self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green', height = 1000)
+        self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green', height = 10)
+        
+        self.rightFrameBottom.columnconfigure(0, weight=1)
+        self.rightFrameBottom.columnconfigure(1, weight=1)
+        # self.rightFrameBottom.rowconfigure(0, weight=1)
+        
+        self.saveImgasNPYButton(master = self.rightFrameBottom)
+        self.saveUnfoldDatButton(master = self.rightFrameBottom)
+
+
+    def saveImgasNPYButton(self, master):
+        self.button = ctk.CTkButton(master=master,
+                                                    text='Save Image as NPY (3D array)',
+                                                    fg_color='red',
+                                                    bg_color='white',
+                                                    hover = True,
+                                                    corner_radius=100,
+                                                    border_width=5,
+                                                    border_color='red',
+                                                    command=button_event)
+
+        self.button.grid(row = 0, column = 0, sticky='ew')
+        
+        
+    def saveUnfoldDatButton(self, master):
+        self.button = ctk.CTkButton(master=master,
+                                                    text='Save Unfold Image (.txt)',
+                                                    fg_color='red',
+                                                    bg_color='black',
+                                                    hover = True,
+                                                    corner_radius=100,
+                                                    border_width=5,
+                                                    border_color='red',
+                                                    command=button_event)
+        self.button.grid(row = 0, column = 1, sticky='ew')
+        
+        
+        
 app = App()
 app.mainloop()
 
