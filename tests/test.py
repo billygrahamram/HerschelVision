@@ -82,6 +82,10 @@ def button_event():
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
+        
+        #inheriting the data analysis class
+    
+        
         self.geometry("900x400")
         self.title("Herchel Vision Test Phase")
         self.resizable(width=True, height=True)
@@ -149,80 +153,88 @@ class App(ctk.CTk):
         self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 1)
         self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 1)
     
+
+    
+    def full_image(self,event, file_path, canvas):
+        
+        
+        img_original = Image.open(file_path)
+        
+        img_tk = ImageTk.PhotoImage(img_original)
+        
+        
+        canvas_ratio = event.width / event.height
+        img_ratio = img_original.size[0]/img_original.size[1]
+        
+        if canvas_ratio > img_ratio:
+            height = int(event.height)
+            width = int(height * img_ratio)
+        else:
+            width = int(event.width)
+            height = int(width/img_ratio)
+            
+            
+        resized_image = img_original.resize((width, height))
+        resized_tk = ImageTk.PhotoImage(resized_image)
+        canvas.create_image(
+            int(event.width/2), 
+            int(event.height/2), 
+            anchor = 'center',
+            image=resized_tk)
+        canvas.image = resized_tk
+        
     def open(self):
         file_path = tk.filedialog.askopenfilename(initialdir="/", 
                                                 title="Select file",
-                                                filetypes = (("JPEG File", "*.jpg"),("all files","*.*")))
+                                                filetypes = (("Jpeg Image", "*.jpg"),
+                                                             ("Png Image", "*.png"),
+                                                             ("all files","*.*")))
         
-        self.img_original = Image.open(file_path)
-        self.img_ratio = self.img_original.size[0]/self.img_original.size[1]
-        self.img_tk = ImageTk.PhotoImage(self.img_original)
-
-        # Clear self.leftFrame
         for widget in self.leftFrame.winfo_children():
             widget.destroy()
         
-        self.canvas = tk.Canvas(self.leftFrame, 
-                           background="black", 
+        openCanvas = tk.Canvas(self.leftFrame, 
+                            
                            bd =0,
                            highlightthickness=0,
                            relief='ridge')
         
-        self.canvas.pack(expand=True, fill='both')
-        self.canvas.bind('<Configure>',self.full_image)
-    
-    def full_image(self, event):
-        
-        self.canvas_ratio = event.width / event.height
-        
-        
-        if self.canvas_ratio > self.img_ratio:
-            height = int(event.height)
-            width = int(height * self.img_ratio)
-        else:
-            width = int(event.width)
-            height = int(width/self.img_ratio)
-            
-            
-        resized_image = self.img_original.resize((width, height))
-        self.resized_tk = ImageTk.PhotoImage(resized_image)
-        self.canvas.create_image(
-            int(event.width/2), 
-            int(event.height/2), 
-            anchor = 'center',
-            image=self.resized_tk)
+        openCanvas.pack(expand=True, fill='both')
+        openCanvas.bind('<Configure>',lambda event: self.full_image(event, file_path, canvas=openCanvas))
         
     def about(self):
-            
+        
+        
+        file_path= 'data/HerschelVisionAbout.png'
+        
         # creates a new top level tkinter window.
-        self.about_window = ctk.CTkToplevel(self)
-        self.about_window.title("About")
-        self.about_window.geometry("400x400")
-        self.about_window.resizable(width=False, height=False)
+        about_window = ctk.CTkToplevel(self)
+        about_window.transient(self) 
+        about_window.title("About")
+        about_window.geometry("400x400")
+        about_window.resizable(width=False, height=False)
 
 
         # routes all event for the app to about window.
         # user cannot intereact with app until about window is closed.
-        self.about_window.grab_set()
+        # self.about_window.grab_set()
         
         # makes the popup window appear on top of the application window
         # instead of a seperate desktop window.
-        self.about_window.attributes('-topmost', True)
-        self.about_window.after_idle(self.about_window.attributes, '-topmost', False)
+        about_window.attributes('-topmost', True)
+        about_window.after_idle(about_window.attributes, '-topmost', False)
         
-        self.img_original = Image.open('data/HerschelVisionAbout.png')
-        self.img_ratio = self.img_original.size[0]/self.img_original.size[1]
-        self.img_tk = ImageTk.PhotoImage(self.img_original)
         
-        self.canvas = tk.Canvas(master = self.about_window,
-                                background = "black",
+        
+        aboutCanvas = tk.Canvas(master = about_window,
+                                
                                 bd = 0,
                                 highlightthickness = 0,
                                 relief = 'ridge'
                                 )
         
-        self.canvas.pack(expand=True, fill='both')
-        self.canvas.bind('<Configure>',self.full_image)
+        aboutCanvas.pack(expand=True, fill='both')
+        aboutCanvas.bind('<Configure>',lambda event: self.full_image(event, file_path, canvas=aboutCanvas))
           
     def imageSegmentationWindow(self):
         
@@ -555,10 +567,8 @@ class App(ctk.CTk):
                                                     command=button_event)
         self.button.grid(row = 0, column = 1, sticky='ew')
         
+        
 
-
-class dataAnalysis(App):
-    pass
         
 app = App()
 app.mainloop()

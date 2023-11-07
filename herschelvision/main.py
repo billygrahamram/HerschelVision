@@ -1,3 +1,14 @@
+#####################################################################################
+## Author: Billy G. Ram
+## Linkedin: https://www.linkedin.com/in/billygrahamram/
+## Twitter: https://twitter.com/billygrahamram
+## Github: https://github.com/billygrahamram
+
+## This code solely belongs to Billy G. Ram and is currently NOT open sourced. 
+#####################################################################################
+
+
+
 import customtkinter as ctk
 import tkinter as tk
 from PIL import Image, ImageTk
@@ -9,9 +20,9 @@ ctk.set_appearance_mode("white")
 
 def frame(master,
           corner_radius=0,
-          fg_color='gray',
-          border_width=5,
-          border_color="black",
+          
+          border_width=1,
+          border_color="gray",
           width = 100,
           height = 100,
           side='left',
@@ -20,7 +31,7 @@ def frame(master,
     
     frame = ctk.CTkFrame(master=master, 
                          corner_radius=corner_radius, 
-                         fg_color=fg_color, 
+                         
                          border_width=border_width, 
                          border_color=border_color,
                          width = width,
@@ -32,14 +43,14 @@ def frame(master,
 
 def button(master,
            text='Button',
-           fg_color='red',
+          
            bg_color='white',
            hover = True,
            width = 300,
            height = 10,
            corner_radius=100,
-           border_width=5,
-           border_color='red',
+           border_width=1,
+           border_color='gray',
            side='top',
            fill='both',
            expand=True,
@@ -47,7 +58,7 @@ def button(master,
     
     button = ctk.CTkButton(master=master,
                            text=text,
-                           fg_color=fg_color,
+                           
                            bg_color=bg_color,
                            hover = hover,
                            width = width,
@@ -77,8 +88,8 @@ class App(ctk.CTk):
     
     
         ## children to main window
-        self.menuBarFrame = frame(master = self, side = 'top', border_width=0 ,fill = 'x', expand=False, fg_color='white')
-        self.workAreaFrame = frame(master = self, side = 'top', border_width=0,fill = 'both', expand= True, fg_color='white')
+        self.menuBarFrame = frame(master = self, side = 'top', border_width=1 ,fill = 'x', expand=False)
+        self.workAreaFrame = frame(master = self, side = 'top', border_width=1,fill = 'both', expand= True)
         
         # opens the home window by default
         self.homeWindow()
@@ -88,7 +99,7 @@ class App(ctk.CTk):
 
     def mainMenu(self):
         ## children to menuBarFrame. Menu bar buttons
-        self.FileOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["New","Open","Save","Export","Exit"], command=self.optionmenu_callback)
+        self.FileOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Home","New","Open","Save","Export","Exit"], command=self.optionmenu_callback)
         self.FileOptionMenu.set("File")
         self.FileOptionMenu.pack(side= 'left',padx=5, pady=5)
         
@@ -100,7 +111,7 @@ class App(ctk.CTk):
         self.ToolsOptionMenu.set("Tools")
         self.ToolsOptionMenu.pack(side= 'left',padx=5, pady=5)
 
-        self.AboutOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Updates","Version","About", "Contact us"], command=self.optionmenu_callback)
+        self.AboutOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
         self.AboutOptionMenu.set("About")
         self.AboutOptionMenu.pack(side= 'left',padx=5, pady=5)
        
@@ -113,13 +124,15 @@ class App(ctk.CTk):
         elif choice == 'About':
             self.about()
         elif choice == 'Segmentation':
-            self.greenboard()
+            self.imageSegmentationWindow()
         elif choice == 'Preliminary Analysis':
             self.homeWindow()
         elif choice == 'Preprocessing':
-            self.greenboard()
+            self.preprocessingWindow()
         elif choice == 'Preferences':
-            self.preferences()
+            self.preferencesWindow()
+        elif choice == 'Home':
+            self.homeWindow()
 
     
     def homeWindow(self):
@@ -128,13 +141,13 @@ class App(ctk.CTk):
             widget.destroy()
             
         ## children to workMenuFrame 
-        self.leftFrame = frame(master=self.workAreaFrame, side='left', border_width= 20)
-        self.rightFrame = frame(master=self.workAreaFrame, side='right', border_width= 20)
+        self.leftFrame = frame(master=self.workAreaFrame, side='left', border_width= 1)
+        self.rightFrame = frame(master=self.workAreaFrame, side='right', border_width= 1)
         
         
         ## children to righFrame
-        self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
-        self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 20, border_color='green')
+        self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 1)
+        self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 1)
     
     def open(self):
         file_path = tk.filedialog.askopenfilename(initialdir="/", 
@@ -211,173 +224,297 @@ class App(ctk.CTk):
         self.canvas.pack(expand=True, fill='both')
         self.canvas.bind('<Configure>',self.full_image)
           
-    def greenboard(self):
+    def imageSegmentationWindow(self):
         
         # Clear self.workAreaFrame
         for widget in self.workAreaFrame.winfo_children():
             widget.destroy()
         
         ## children to workMenuFrame 
-        self.leftFrame = frame(master=self.workAreaFrame, 
+        self.leftButtonsImgSegFrame = frame(master=self.workAreaFrame, 
                                side='left', 
-                               border_width= 20,
-                               fg_color='white', expand = False,
+                               border_width= 1,
+                               expand = False,
                                width = self.dimensionPercentage(4, dimension='w'),
                                height = self.dimensionPercentage(100, dimension='h'))
-        self.middleFrame = frame(master=self.workAreaFrame, 
+        self.middleImgSegFrame = frame(master=self.workAreaFrame, 
                                  side='left', 
-                                 border_width= 20,
-                                 fg_color='red',
+                                 border_width= 1,
+                                 
                                  width = self.dimensionPercentage(48, dimension='w'),
                                  height = self.dimensionPercentage(100, dimension='h'))
-        self.rightFrame = frame(master=self.workAreaFrame, 
+        self.rightImgSegFrame = frame(master=self.workAreaFrame, 
                                 side='left', 
-                                border_width= 20,
-                                fg_color='green', 
+                                border_width= 1,
+                                
                                 width = self.dimensionPercentage(48, dimension='w'),
                                 height = self.dimensionPercentage(100, dimension='h'))
         
         ## children to righFrame
-        self.rightFrameTop = frame(master=self.rightFrame, 
+        self.rightImgSegTopFrame = frame(master=self.rightImgSegFrame, 
                                    side='top', 
-                                   border_width= 20, 
-                                   border_color='green',
+                                   border_width= 1, 
+                                   border_color='gray',
                                    height =  self.dimensionPercentage(70, dimension='h'))
-        self.rightFrameBottom = frame(master=self.rightFrame, 
+        self.rightImgSegBottomButtonFrame = frame(master=self.rightImgSegFrame, 
                                       side='top', 
-                                      border_width= 20, 
-                                      border_color='green', expand = False,
+                                      border_width= 1, 
+                                      border_color='gray', expand = False,
                                       height = self.dimensionPercentage(30, dimension='h'))
         
-        self.rightFrameBottom.columnconfigure(0, weight=1)
-        self.rightFrameBottom.columnconfigure(1, weight=1)
+        self.rightImgSegBottomButtonFrame.columnconfigure(0, weight=1)
+        self.rightImgSegBottomButtonFrame.columnconfigure(1, weight=1)
+
+        ## RIGHT BOTTOM Buttons
+        self.saveImgasNPYButton(master = self.rightImgSegBottomButtonFrame)
+        self.saveUnfoldDatButton(master = self.rightImgSegBottomButtonFrame)
+        
+        ## LEFT SIDE BUTTONS
+        ## children to leftButtonsFrame. Preferences buttons
+        ## label and dropdown for the preprocessing methods
+
+        self.ImgSegOptions = ctk.CTkOptionMenu(master = self.leftButtonsImgSegFrame,
+                                                values = ["K-means clustering", 
+                                                          "Segment Anything"],command = self.optionmenu_callback)
+        self.ImgSegOptions.set("Segmentation Models")
+        self.ImgSegOptions.pack(side= 'top',padx=50, pady=(50,10))
+        self.ImgSegParametersButton = ctk.CTkButton(master=self.leftButtonsImgSegFrame, text="Parameters", command=self.preferencesWindow)
+        self.ImgSegParametersButton.pack(side= 'top',padx=50, pady=10)
+
+
+
+    def preprocessingWindow(self):
+        
+        # Clear self.workAreaFrame
+        for widget in self.workAreaFrame.winfo_children():
+            widget.destroy()
+        
+        ## children to workMenuFrame 
+        self.leftButtonsPreProFrame = frame(master=self.workAreaFrame, 
+                               side='left', 
+                               border_width= 1,
+                            expand = False,
+                               width = self.dimensionPercentage(4, dimension='w'),
+                               height = self.dimensionPercentage(100, dimension='h'))
+        self.middlePreProFrame = frame(master=self.workAreaFrame, 
+                                 side='left', 
+                                 border_width= 1,
+                                 
+                                 width = self.dimensionPercentage(48, dimension='w'),
+                                 height = self.dimensionPercentage(100, dimension='h'))
+        self.rightPreProFrame = frame(master=self.workAreaFrame, 
+                                side='left', 
+                                border_width= 1,
+                                
+                                width = self.dimensionPercentage(48, dimension='w'),
+                                height = self.dimensionPercentage(100, dimension='h'))
+        
+        ## children to righFrame
+        self.rightPreProTopFrame = frame(master=self.rightPreProFrame, 
+                                   side='top', 
+                                   border_width= 1, 
+                                   border_color='gray',
+                                   height =  self.dimensionPercentage(70, dimension='h'))
+        self.rightPreProBottomButtonFrame = frame(master=self.rightPreProFrame, 
+                                      side='top', 
+                                      border_width= 1, 
+                                      border_color='gray', expand = False,
+                                      height = self.dimensionPercentage(30, dimension='h'))
+        
+        self.rightPreProBottomButtonFrame.columnconfigure(0, weight=1)
+        self.rightPreProBottomButtonFrame.columnconfigure(1, weight=1)
+
+        ## RIGHT BOTTOM Buttons
+        self.saveImgasNPYButton(master = self.rightPreProBottomButtonFrame)
+        self.saveUnfoldDatButton(master = self.rightPreProBottomButtonFrame)
+        
+        ## LEFT SIDE BUTTONS
+        ## children to leftButtonsFrame. Preferences buttons
+        ## label and dropdown for the preprocessing methods
+
+        self.PreProOptions = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
+                                                values = ["SNV", 
+                                                          "MSC",
+                                                          "SG",
+                                                          "Normalize"],command = self.optionmenu_callback)
+        self.PreProOptions.set("PreProcessing Methods")
+        self.PreProOptions.pack(side= 'top',padx=50, pady=(50,10))
+        self.PreProParametersButton = ctk.CTkButton(master=self.leftButtonsPreProFrame, text="Parameters", command=self.preferencesWindow)
+        self.PreProParametersButton.pack(side= 'top',padx=50, pady=10)
+
 
         
-        self.saveImgasNPYButton(master = self.rightFrameBottom)
-        self.saveUnfoldDatButton(master = self.rightFrameBottom)
-
-    def preferences(self): # the settings window that allows the user to input/select variables for analysis inputs.
+        
+    def preferencesWindow(self): # the settings window that allows the user to input/select variables for analysis inputs.
         
         # Clear self.workAreaFrame
         for widget in self.workAreaFrame.winfo_children():
             widget.destroy()
             
         ## children to workAreaFrame 
-        self.leftButtonsFrame = frame(master=self.workAreaFrame,  
-                                      border_width= 20,
-                                      fg_color='white', 
+        self.leftPreferenceButtonsFrame = frame(master=self.workAreaFrame,  
+                                      border_width= 1,
+                                      
                                       width = self.dimensionPercentage(5, dimension='w'), 
                                       height = self.dimensionPercentage(100, dimension='h'),
                                       side='left', expand = False, fill ='both')
-        self.rightFormFrame = frame(master=self.workAreaFrame,  
-                                       border_width= 20,
-                                       fg_color='green', 
+        self.rightPreferenceFormFrame = frame(master=self.workAreaFrame,  
+                                       border_width= 1,
+                                       
                                        width = self.dimensionPercentage(95, dimension='w'), 
                                        height = self.dimensionPercentage(100, dimension='h'),
                                        side='left')
-    
+            # Clear rightFormFrame
+        for widget in self.rightPreferenceFormFrame.winfo_children():
+            widget.destroy()
+        self.PreprocessingButton_callback()
+        
         ## LEFT SIDE BUTTONS
         ## children to leftButtonsFrame. Preferences buttons
-        self.PreprocessingButton = ctk.CTkButton(master=self.leftButtonsFrame, text="Preprocessing", command=self.PreprocessingButton_callback)
-        self.PreprocessingButton.pack(side= 'top',padx=10, pady=10)
-        self.SegmentationButton = ctk.CTkButton(master=self.leftButtonsFrame, text="Segmentation", command=self.SegmentationButton_callback)
-        self.SegmentationButton.pack(side= 'top',padx=10, pady=10)
-        self.RGBButton = ctk.CTkButton(master=self.leftButtonsFrame, text="RGB Bands", command=self.RGBButton_callback)
-        self.RGBButton.pack(side= 'top',padx=5, pady=10)
-        self.EMRButton = ctk.CTkButton(master=self.leftButtonsFrame, text="Wavelengths", command=self.EMRButton_callback)
-        self.EMRButton.pack(side= 'top',padx=5, pady=10)
+        self.PreprocessingButton = ctk.CTkButton(master=self.leftPreferenceButtonsFrame, text="Preprocessing", command=self.PreprocessingButton_callback)
+        self.PreprocessingButton.pack(side= 'top',padx=50, pady=(50,10))
+        self.SegmentationButton = ctk.CTkButton(master=self.leftPreferenceButtonsFrame, text="Segmentation", command=self.SegmentationButton_callback)
+        self.SegmentationButton.pack(side= 'top',padx=50, pady=10)
+        self.RGBButton = ctk.CTkButton(master=self.leftPreferenceButtonsFrame, text="RGB Bands", command=self.RGBButton_callback)
+        self.RGBButton.pack(side= 'top',padx=50, pady=10)
+        self.EMRButton = ctk.CTkButton(master=self.leftPreferenceButtonsFrame, text="Wavelengths", command=self.EMRButton_callback)
+        self.EMRButton.pack(side= 'top',padx=50, pady=10)
         
     def PreprocessingButton_callback(self):
         # Clear rightFormFrame
-        for widget in self.rightFormFrame.winfo_children():
+        for widget in self.rightPreferenceFormFrame.winfo_children():
             widget.destroy()
                 ## user input forms on the right side of window for various buttons.
   
-        self.PreprocessingForm = frame(master=self.rightFormFrame,  
-                                        border_width= 20,
-                                        fg_color='white', 
+        self.PreprocessingForm = frame(master=self.rightPreferenceFormFrame,  
+                                        border_width= 1,
+                                        
                                         side='left',  fill ='both')
         
-        
+
         ## label and dropdown for the preprocessing methods
         self.ppModelLabel = ctk.CTkLabel(master = self.PreprocessingForm, text = "Select your preprocessing method:  ", anchor='w')
-        self.ppModelLabel.grid(row = 0, column = 0,padx=5, pady=5, sticky = 'ew')
+        self.ppModelLabel.grid(row = 0, column = 0,padx=100, pady=(100,5), sticky = 'ew')
         self.ppModelOptions = ctk.CTkOptionMenu(master = self.PreprocessingForm,
                                                 values = ["Standard Normal Variate", 
                                                           "Multiplicative Scatter Correction", 
                                                           "Savitzky-Golay", 
                                                           "Normalization"],command = self.optionmenu_callback)
         self.ppModelOptions.set("Preprocessing Models")
-        self.ppModelOptions.grid(row = 0, column = 1 ,padx=5, pady=5, sticky = 'ew')
+        self.ppModelOptions.grid(row = 0, column = 1 ,padx=100, pady=(100,5), sticky = 'ew')
         
         
         ## label and input field for savitzky golay window size
         self.ppSGWinSizeLabel = ctk.CTkLabel(master = self.PreprocessingForm, text = "Enter Window Size for Savitzky Golay:  ", anchor = 'w')
-        self.ppSGWinSizeLabel.grid(row = 1, column = 0, padx=5, pady=5, sticky = 'ew')
+        self.ppSGWinSizeLabel.grid(row = 1, column = 0, padx=100, pady=5, sticky = 'ew')
         self.ppSGWinSizeEntry = ctk.CTkEntry(master = self.PreprocessingForm, placeholder_text="Enter window size" )
-        self.ppSGWinSizeEntry.grid(row = 1, column = 1,padx=5, pady=5,sticky = 'ew')
+        self.ppSGWinSizeEntry.grid(row = 1, column = 1,padx=100, pady=5,sticky = 'ew')
                                    
         
         ## label and input field for savitzky golay derivative
         self.ppSGDerivLabel = ctk.CTkLabel(master = self.PreprocessingForm, text = "Enter Savitzky Golay Derivative:  ", anchor = 'w')
-        self.ppSGDerivLabel.grid(row = 2, column = 0, padx=5, pady=5, sticky = 'ew')
+        self.ppSGDerivLabel.grid(row = 2, column = 0, padx=100, pady=5, sticky = 'ew')
         self.ppSGDerivEntry = ctk.CTkEntry(master = self.PreprocessingForm, placeholder_text="Enter Derivative Number" )
-        self.ppSGDerivEntry.grid(row = 2, column = 1,padx=5, pady=5,sticky = 'ew')
+        self.ppSGDerivEntry.grid(row = 2, column = 1,padx=100, pady=5,sticky = 'ew')
         
     def SegmentationButton_callback(self):
         # Clear rightFormFrame
-        for widget in self.rightFormFrame.winfo_children():
+        for widget in self.rightPreferenceFormFrame.winfo_children():
             widget.destroy()
                 ## user input forms on the right side of window for various buttons.
   
-        self.SegmentationForm = frame(master=self.rightFormFrame,  
-                                        border_width= 20,
-                                        fg_color='white', 
+        self.SegmentationForm = frame(master=self.rightPreferenceFormFrame,  
+                                        border_width= 1,
+                                         
                                         side='left',  fill ='both')
         
         ## label and input field for savitzky golay window size
         self.segKclusterLabel = ctk.CTkLabel(master = self.SegmentationForm, text = "Enter the number of clusters for K-means:  ", anchor = 'w')
-        self.segKclusterLabel.grid(row = 1, column = 0, padx=5, pady=5, sticky = 'ew')
+        self.segKclusterLabel.grid(row = 0, column = 0, padx=100, pady=(100,5), sticky = 'ew')
         self.segKclusterEntry = ctk.CTkEntry(master = self.SegmentationForm, placeholder_text="Enter cluster numbers" )
-        self.segKclusterEntry.grid(row = 1, column = 1,padx=5, pady=5,sticky = 'ew')
+        self.segKclusterEntry.grid(row = 0, column = 1,padx=100, pady=(100,5),sticky = 'ew')
                                    
         
         ## label and input field for savitzky golay derivative
         self.segThresLabel = ctk.CTkLabel(master = self.SegmentationForm, text = "Enter Segmentation Thresholding value:  ", anchor = 'w')
-        self.segThresLabel.grid(row = 2, column = 0, padx=5, pady=5, sticky = 'ew')
+        self.segThresLabel.grid(row = 1, column = 0, padx=100, pady=5, sticky = 'ew')
         self.segThresEntry = ctk.CTkEntry(master = self.SegmentationForm, placeholder_text="Threshold number" )
-        self.segThresEntry.grid(row = 2, column = 1,padx=5, pady=5,sticky = 'ew')
+        self.segThresEntry.grid(row = 1, column = 1,padx=100, pady=5,sticky = 'ew')
         
         ## label and dropdown for the preprocessing methods
         self.segSAMModelLabel = ctk.CTkLabel(master = self.SegmentationForm, text = "Select your SAM model:  ", anchor='w')
-        self.segSAMModelLabel.grid(row = 0, column = 0,padx=5, pady=5, sticky = 'ew')
+        self.segSAMModelLabel.grid(row = 2, column = 0,padx=100, pady=5, sticky = 'ew')
         self.segSAMModelOptions = ctk.CTkOptionMenu(master = self.SegmentationForm,
                                                 values = ["ViT-H SAM Model", 
                                                           "ViT-L SAM Model", 
                                                           "ViT-B SAM Model"],command = self.optionmenu_callback)
         self.segSAMModelOptions.set("SAM Models")
-        self.segSAMModelOptions.grid(row = 0, column = 1 ,padx=5, pady=5, sticky = 'ew')
+        self.segSAMModelOptions.grid(row = 2, column = 1 ,padx=100, pady=5, sticky = 'ew')
         
         
     def RGBButton_callback(self):
-        # Clear self.rightFormFrame
-        for widget in self.rightFormFrame.winfo_children():
+        # Clear rightFormFrame
+        for widget in self.rightPreferenceFormFrame.winfo_children():
             widget.destroy()
-        ## user input forms on the right side of window for various buttons.
-        self.RGBForm = frame(master=self.rightFormFrame,  
-                                        border_width= 20,
-                                        fg_color='green',
-                                        side='left', fill ='both')
+                ## user input forms on the right side of window for various buttons.
+  
+        self.PseudoRGBFrame = frame(master=self.rightPreferenceFormFrame,  
+                                        border_width= 1,
+                                        
+                                        side='left',  fill ='both')
+        
+        ## label and input field for savitzky golay window size
+        self.RedbandLabel = ctk.CTkLabel(master = self.PseudoRGBFrame, text = "Enter the Red band number for Pseudo RGB Image:  ", anchor = 'w')
+        self.RedbandLabel.grid(row = 0, column = 0, padx=100, pady=(100,5), sticky = 'ew')
+        self.RedbandEntry = ctk.CTkEntry(master = self.PseudoRGBFrame, placeholder_text="Red band number" )
+        self.RedbandEntry.grid(row = 0, column = 1,padx=100, pady=(100,5),sticky = 'ew')
+                                   
+        ## label and input field for savitzky golay derivative
+        self.GreenbandLabel = ctk.CTkLabel(master = self.PseudoRGBFrame, text = "Enter the Green band number for Pseudo RGB Image:  ", anchor = 'w')
+        self.GreenbandLabel.grid(row = 1, column = 0, padx=100, pady=5, sticky = 'ew')
+        self.GreenbandEntry = ctk.CTkEntry(master = self.PseudoRGBFrame, placeholder_text="Green band number" )
+        self.GreenbandEntry.grid(row = 1, column = 1,padx=100, pady=5,sticky = 'ew')
+        
+        ## label and input field for savitzky golay derivative
+        self.BluebandLabel = ctk.CTkLabel(master = self.PseudoRGBFrame, text = "Enter the Blue band number for Pseudo RGB Image:  ", anchor = 'w')
+        self.BluebandLabel.grid(row = 2, column = 0, padx=100, pady=5, sticky = 'ew')
+        self.BluebandEntry = ctk.CTkEntry(master = self.PseudoRGBFrame, placeholder_text="Blue band number" )
+        self.BluebandEntry.grid(row = 2, column = 1,padx=100, pady=5,sticky = 'ew')
 
     def EMRButton_callback(self):
-        # Clear self.rightFormFrame
-        for widget in self.rightFormFrame.winfo_children():
+        # Clear rightFormFrame
+        for widget in self.rightPreferenceFormFrame.winfo_children():
             widget.destroy()
-        ## user input forms on the right side of window for various buttons.
-        self.EMRForm = frame(master=self.rightFormFrame,  
-                                        border_width= 20,
-                                        fg_color='blue', 
+                ## user input forms on the right side of window for various buttons.
+  
+        self.EMRInfoFrame = frame(master=self.rightPreferenceFormFrame,  
+                                        border_width= 1,
+                                        
                                         side='left',  fill ='both')
+        
+        ## label and input field for savitzky golay window size
+        self.BandNoLabel = ctk.CTkLabel(master = self.EMRInfoFrame, text = "Enter the number of bands in your dataset:  ", anchor = 'w')
+        self.BandNoLabel.grid(row = 0, column = 0, padx=100, pady=(100,5), sticky = 'ew')
+        self.BandNoEntry = ctk.CTkEntry(master = self.EMRInfoFrame, placeholder_text="Total number of bands" )
+        self.BandNoEntry.grid(row = 0, column = 1,padx=100, pady=(100,5),sticky = 'ew')
+                                   
+        ## label and input field for savitzky golay derivative
+        self.FirstbandLabel = ctk.CTkLabel(master = self.EMRInfoFrame, text = "Enter the first wavelength of range in nm:  ", anchor = 'w')
+        self.FirstbandLabel.grid(row = 1, column = 0, padx=100, pady=5, sticky = 'ew')
+        self.FirstbandEntry = ctk.CTkEntry(master = self.EMRInfoFrame, placeholder_text="First nanometer" )
+        self.FirstbandEntry.grid(row = 1, column = 1,padx=100, pady=5,sticky = 'ew')
+        
+        ## label and input field for savitzky golay derivative
+        self.LastbandLabel = ctk.CTkLabel(master = self.EMRInfoFrame, text = "Enter the last wavelength of range in nm:  ", anchor = 'w')
+        self.LastbandLabel.grid(row = 2, column = 0, padx=100, pady=5, sticky = 'ew')
+        self.LastbandEntry = ctk.CTkEntry(master = self.EMRInfoFrame, placeholder_text="Last nanometer" )
+        self.LastbandEntry.grid(row = 2, column = 1,padx=100, pady=5,sticky = 'ew')
+        
+        ## label and input field for savitzky golay derivative
+        self.SpectralResolutionLabel = ctk.CTkLabel(master = self.EMRInfoFrame, text = "Enter the spectral resolution of your sensor:  ", anchor = 'w')
+        self.SpectralResolutionLabel.grid(row = 3, column = 0, padx=100, pady=5, sticky = 'ew')
+        self.SpectralResolutionEntry = ctk.CTkEntry(master = self.EMRInfoFrame, placeholder_text="Spectral Resolution" )
+        self.SpectralResolutionEntry.grid(row = 3, column = 1,padx=100, pady=5,sticky = 'ew')
 
  
     def dimensionPercentage(self, percent, dimension='w'):
@@ -395,12 +532,12 @@ class App(ctk.CTk):
     def saveImgasNPYButton(self, master):
         self.button = ctk.CTkButton(master=master,
                                                     text='Save Image as NPY (3D array)',
-                                                    fg_color='red',
+                                                    
                                                     bg_color='white',
                                                     hover = True,
-                                                    corner_radius=100,
-                                                    border_width=5,
-                                                    border_color='red',
+                                                    
+                                                    border_width=1,
+                                                    border_color='gray',
                                                     command=button_event)
 
         self.button.grid(row = 0, column = 0, sticky='ew')
@@ -409,16 +546,19 @@ class App(ctk.CTk):
     def saveUnfoldDatButton(self, master):
         self.button = ctk.CTkButton(master=master,
                                                     text='Save Unfold Image (.txt)',
-                                                    fg_color='red',
-                                                    bg_color='black',
+                                                    
+                                                    bg_color='white',
                                                     hover = True,
-                                                    corner_radius=100,
-                                                    border_width=5,
-                                                    border_color='red',
+                                                    
+                                                    border_width=1,
+                                                    border_color='gray',
                                                     command=button_event)
         self.button.grid(row = 0, column = 1, sticky='ew')
         
-        
+
+
+class dataAnalysis(App):
+    pass
         
 app = App()
 app.mainloop()
