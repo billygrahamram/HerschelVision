@@ -18,3 +18,10 @@ def create_pseudo_rgb(arr, r_band, g_band, b_band):
     rgb = np.dstack((r,g,b)).astype(np.uint8)
     
     return rgb
+
+
+def single_band(arr, band):
+    # Normalize the bands to the range [0, 255]
+    band = (arr[:,:,band] - np.min(arr[:,:,band])) / (np.max(arr[:,:,band]) - np.min(arr[:,:,band])) * 255
+    
+    return band.astype(np.uint8)

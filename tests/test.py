@@ -10,9 +10,11 @@
 
 import customtkinter as ctk
 import tkinter as tk
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageSequence
 import os
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+
 
 
 ### herschelVision modules ####
@@ -160,18 +162,35 @@ class App(ctk.CTk):
         self.leftFrame = frame(master=self.workAreaFrame, side='left', border_width= 1)
         self.rightFrame = frame(master=self.workAreaFrame, side='right', border_width= 1)
         
+
+        ## children to righFrame
+        self.leftFrameTop = frame(master=self.leftFrame, 
+                                  side='top', 
+                                  border_width= 1, 
+                                  )
+        self.leftFrameBottom = frame(master=self.leftFrame, 
+                                     side='top', 
+                                     border_width= 1,
+                                     expand = False)
         
         ## children to righFrame
         self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 1)
         self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 1)
-    
+
+        
+        
+        self.slider = ctk.CTkSlider(self.leftFrameBottom, from_ = 1, to = 223,
+                                height = 30, command = self.slider_event)
+        self.slider.pack(side='bottom', expand = False, fill ='x')
+        self.slider_event(220) 
+        
         # Check if the txt file in history/img_dir_record.txt is empty or not
         # this code makes sure that if the image is 
         data_path_file = os.path.join('history', 'img_dir_record.txt')
         if os.path.exists(data_path_file) and os.path.getsize(data_path_file) > 0:
             with open(data_path_file, 'r') as f:
                 self.raw_img_dir = f.read().strip()
-                HomeCanvas = tk.Canvas(self.leftFrame, 
+                HomeCanvas = tk.Canvas(self.leftFrameTop, 
                             
                         bd =0,
                         highlightthickness=0,
@@ -226,7 +245,6 @@ class App(ctk.CTk):
                 self.raw_img_dir = raw_img_dir
                 
         
-        
         # Save the raw_img_dir to a text file in the history folder
         os.makedirs('history', exist_ok=True) #make sure the history folder exists. if not creates one.
         with open(os.path.join('history', 'img_dir_record.txt'), 'w') as f:
@@ -258,36 +276,52 @@ class App(ctk.CTk):
             for line in lines:
                 f.write(line + '\n')
         #########################################################
-
-        spectral_array = readData(self.raw_img_dir)
+    
+    def slider_event(self, value):
         
-        
-        pseudo_img = create_pseudo_rgb(spectral_array, 70,100,130)
-        
-        
-        self.tk_image = Image.fromarray(np.uint8(pseudo_img))
-        # tk_image = ImageTk.PhotoImage(self.tk_image)
-
+        if self.raw_img_dir == None:
+            
+            # Open the GIF file
+            gif = Image.open('data/welcome.gif')
+            # Convert the GIF into a list of frames
+            frames = [frame.copy() for frame in ImageSequence.Iterator(gif)]
+            # Scale the slider value to the range of the GIF frames
+            scaled_value = int(value * len(frames) / 223)
+            # Ensure that the scaled value is at least 1
+            scaled_value = max(1, scaled_value)
+            # Select a single frame (band) based on the slider value
+            single_band_img = frames[scaled_value]
+            
+            # Convert the single band image to a format that can be displayed in Tkinter
+            self.tk_image = Image.fromarray(np.uint8(single_band_img))
+            
+        else:
+            
+            spectral_array = readData(self.raw_img_dir)
+            # # # pseudo_img = create_pseudo_rgb(spectral_array, 70,100,130)
+            single_band_img = single_band(spectral_array, int(value))
+            
+            self.tk_image = Image.fromarray(np.uint8(single_band_img))
+            # # tk_image = ImageTk.PhotoImage(self.tk_image)
         
         ###########################################################
         # destroy the left frame for new image
-        for widget in self.leftFrame.winfo_children():
+        for widget in self.leftFrameTop.winfo_children():
             widget.destroy()
         
-        openCanvas = tk.Canvas(self.leftFrame, 
+        openCanvas = tk.Canvas(self.leftFrameTop, 
                         bd =0,
                         highlightthickness=0,
                         relief='ridge')
-        
-        slider = ctk.CTkSlider(self.leftFrame, from_ = 0, to =100, command = slider_event)
-        
+    
         # makes sure that the new image is displayed as "fit" within the frame.
-        openCanvas.pack(expand=True, fill='both')
+        openCanvas.pack(side = 'top', expand=True, fill='both')
         openCanvas.bind('<Configure>',lambda event: self.full_image(event,self.tk_image, canvas=openCanvas))
         # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
         # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
         # run the self.full_image function”.
         
+    
     def about(self):
         aboutImgpath= 'data/HerschelVisionAbout.png'
         # creates a new top level tkinter window.
