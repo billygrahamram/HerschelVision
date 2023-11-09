@@ -1,0 +1,4 @@
+/Users/billygrahamram/Downloads/FX17_Fire_Susceptible_14_2022-09-07_16-00-25/capture/FX17_Fire_Susceptible_14_2022-09-07_16-00-25.raw
+/Users/billygrahamram/Downloads/test_img_2.jpg
+
+/Users/billygrahamram/Documents/Envs-Codes/HerschelVisionSoftware/data/FX17_Fire_Susceptible_14_2022-09-07_16-00-25/capture/FX17_Fire_Susceptible_14_2022-09-07_16-00-25.raw

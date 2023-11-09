@@ -3,7 +3,6 @@
 ## Linkedin: https://www.linkedin.com/in/billygrahamram/
 ## Twitter: https://twitter.com/billygrahamram
 ## Github: https://github.com/billygrahamram
-
 ## This code solely belongs to Billy G. Ram and is currently NOT open sourced. 
 #####################################################################################
 
@@ -12,8 +11,8 @@
 import customtkinter as ctk
 import tkinter as tk
 from PIL import Image, ImageTk
-
-
+import os
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 ctk.set_appearance_mode("white")
@@ -75,18 +74,26 @@ def button(master,
 def button_event():
     print("button pressed")
     
-
-    
-    
     
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
+        
+        #inheriting the data analysis class
+    
+        
         self.geometry("900x400")
         self.title("Herchel Vision Test Phase")
         self.resizable(width=True, height=True)
     
-    
+        ## self.data_path is the main data directory part for the image currently worked on.
+        self.data_path = None
+        self.recentData_path = None
+        # Empty the data_path.txt file at startup. Opens and closes it, making the file empty.
+        data_path_file = os.path.join('history', 'data_path.txt')
+        with open(data_path_file, 'w') as f:
+            pass
+        
         ## children to main window
         self.menuBarFrame = frame(master = self, side = 'top', border_width=1 ,fill = 'x', expand=False)
         self.workAreaFrame = frame(master = self, side = 'top', border_width=1,fill = 'both', expand= True)
@@ -107,7 +114,7 @@ class App(ctk.CTk):
         self.EditOptionMenu.set("Edit")
         self.EditOptionMenu.pack(side= 'left',padx=5, pady=5)
         
-        self.ToolsOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Preliminary Analysis","Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
+        self.ToolsOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
         self.ToolsOptionMenu.set("Tools")
         self.ToolsOptionMenu.pack(side= 'left',padx=5, pady=5)
 
@@ -125,8 +132,6 @@ class App(ctk.CTk):
             self.about()
         elif choice == 'Segmentation':
             self.imageSegmentationWindow()
-        elif choice == 'Preliminary Analysis':
-            self.homeWindow()
         elif choice == 'Preprocessing':
             self.preprocessingWindow()
         elif choice == 'Preferences':
@@ -149,80 +154,149 @@ class App(ctk.CTk):
         self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 1)
         self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 1)
     
-    def open(self):
-        file_path = tk.filedialog.askopenfilename(initialdir="/", 
-                                                title="Select file",
-                                                filetypes = (("JPEG File", "*.jpg"),("all files","*.*")))
+        # Check if the txt file in history/data_path.txt is empty or not
+        data_path_file = os.path.join('history', 'data_path.txt')
+        if os.path.exists(data_path_file) and os.path.getsize(data_path_file) > 0:
+            with open(data_path_file, 'r') as f:
+                self.data_path = f.read().strip()
+                HomeCanvas = tk.Canvas(self.leftFrame, 
+                            
+                        bd =0,
+                        highlightthickness=0,
+                        relief='ridge')
         
-        self.img_original = Image.open(file_path)
-        self.img_ratio = self.img_original.size[0]/self.img_original.size[1]
-        self.img_tk = ImageTk.PhotoImage(self.img_original)
-
-        # Clear self.leftFrame
-        for widget in self.leftFrame.winfo_children():
-            widget.destroy()
-        
-        self.canvas = tk.Canvas(self.leftFrame, 
-                           background="black", 
-                           bd =0,
-                           highlightthickness=0,
-                           relief='ridge')
-        
-        self.canvas.pack(expand=True, fill='both')
-        self.canvas.bind('<Configure>',self.full_image)
+                HomeCanvas.pack(expand=True, fill='both')
+                HomeCanvas.bind('<Configure>',lambda event: self.full_image(event, self.data_path, canvas=HomeCanvas))
+       
+        else:
+            self.data_path = None
+            
+            
     
-    def full_image(self, event):
+    def full_image(self,event, file_path, canvas):
         
-        self.canvas_ratio = event.width / event.height
+        # this function takes in a image and calculates it's dimension and the window dimension
+        # and then makes sure that the image is fit to the window frame.
+        img_original = Image.open(file_path)
+        
+        img_tk = ImageTk.PhotoImage(img_original)
         
         
-        if self.canvas_ratio > self.img_ratio:
+        canvas_ratio = event.width / event.height
+        img_ratio = img_original.size[0]/img_original.size[1]
+        
+        if canvas_ratio > img_ratio:
             height = int(event.height)
-            width = int(height * self.img_ratio)
+            width = int(height * img_ratio)
         else:
             width = int(event.width)
-            height = int(width/self.img_ratio)
+            height = int(width/img_ratio)
             
             
-        resized_image = self.img_original.resize((width, height))
-        self.resized_tk = ImageTk.PhotoImage(resized_image)
-        self.canvas.create_image(
+        resized_image = img_original.resize((width, height))
+        resized_tk = ImageTk.PhotoImage(resized_image)
+        canvas.create_image(
             int(event.width/2), 
             int(event.height/2), 
             anchor = 'center',
-            image=self.resized_tk)
+            image=resized_tk)
+        canvas.image = resized_tk
+        
+    
+    def open(self):
+        self.data_path = tk.filedialog.askopenfilename(initialdir="/", 
+                                                title="Select file",
+                                                filetypes = (("Jpeg Image", "*.jpg"),
+                                                            ("Png Image", "*.png"),
+                                                            ("all files","*.*")))
+        if not self.data_path:  # Check if data_path is empty
+            # Read the path from the data_path.txt file
+            with open(os.path.join('history', 'data_path.txt'), 'r') as f:
+                data_path = f.read().strip()
+                self.data_path = data_path
+                
+        
+        
+        # Save the data_path to a text file in the history folder
+        os.makedirs('history', exist_ok=True) #make sure the history folder exists. if not creates one.
+        with open(os.path.join('history', 'data_path.txt'), 'w') as f:
+            f.write(self.data_path)
+            
+        ######################### RECENT FILES #################
+        # first reads all the existing paths from the file into a list. 
+        # It then checks if the current path already exists in the list. 
+        # If it doesn’t, the path is added to the top of the list. 
+        # Finally, all the paths are written back to the file. 
+        # This ensures that the most recent path is always at the top and there are no duplicates.
+        
+        # Read the existing paths
+        with open(os.path.join('history', 'recentFiles.txt'), 'r') as f:
+            lines = f.read().splitlines()
+
+        # If the path already exists in the file, remove it
+        if self.data_path in lines:
+            lines.remove(self.data_path)
+
+        # Add the path to the top of the list
+        lines.insert(0, self.data_path)
+
+        # Only keep the 5 most recent paths
+        lines = lines[:5]
+        
+        # Write the paths back to the file
+        with open(os.path.join('history', 'recentFiles.txt'), 'w') as f:
+            for line in lines:
+                f.write(line + '\n')
+        #########################################################
+
+        for widget in self.leftFrame.winfo_children():
+            widget.destroy()
+        
+        openCanvas = tk.Canvas(self.leftFrame, 
+                            
+                        bd =0,
+                        highlightthickness=0,
+                        relief='ridge')
+        
+        openCanvas.pack(expand=True, fill='both')
+        openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.data_path, canvas=openCanvas))
+        # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
+        # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
+        # run the self.full_image function”.
         
     def about(self):
-            
+        
+        
+        aboutImgpath= 'data/HerschelVisionAbout.png'
+        
         # creates a new top level tkinter window.
-        self.about_window = ctk.CTkToplevel(self)
-        self.about_window.title("About")
-        self.about_window.geometry("400x400")
-        self.about_window.resizable(width=False, height=False)
+        about_window = ctk.CTkToplevel(self)
+        about_window.transient(self) 
+        about_window.title("About")
+        about_window.geometry("400x400")
+        about_window.resizable(width=False, height=False)
 
 
         # routes all event for the app to about window.
         # user cannot intereact with app until about window is closed.
-        self.about_window.grab_set()
+        about_window.grab_set()
         
         # makes the popup window appear on top of the application window
         # instead of a seperate desktop window.
-        self.about_window.attributes('-topmost', True)
-        self.about_window.after_idle(self.about_window.attributes, '-topmost', False)
+        about_window.attributes('-topmost', True)
+        about_window.after_idle(about_window.attributes, '-topmost', False)
         
-        self.img_original = Image.open('data/HerschelVisionAbout.png')
-        self.img_ratio = self.img_original.size[0]/self.img_original.size[1]
-        self.img_tk = ImageTk.PhotoImage(self.img_original)
         
-        self.canvas = tk.Canvas(master = self.about_window,
-                                background = "black",
+        
+        aboutCanvas = tk.Canvas(master = about_window,
+                                
                                 bd = 0,
                                 highlightthickness = 0,
                                 relief = 'ridge'
                                 )
         
-        self.canvas.pack(expand=True, fill='both')
-        self.canvas.bind('<Configure>',self.full_image)
+        aboutCanvas.pack(expand=True, fill='both')
+        aboutCanvas.bind('<Configure>',lambda event: self.full_image(event, aboutImgpath, canvas=aboutCanvas))
           
     def imageSegmentationWindow(self):
         
@@ -533,7 +607,7 @@ class App(ctk.CTk):
         self.button = ctk.CTkButton(master=master,
                                                     text='Save Image as NPY (3D array)',
                                                     
-                                                    bg_color='white',
+                                                    
                                                     hover = True,
                                                     
                                                     border_width=1,
@@ -547,7 +621,7 @@ class App(ctk.CTk):
         self.button = ctk.CTkButton(master=master,
                                                     text='Save Unfold Image (.txt)',
                                                     
-                                                    bg_color='white',
+                                                    
                                                     hover = True,
                                                     
                                                     border_width=1,
@@ -555,11 +629,10 @@ class App(ctk.CTk):
                                                     command=button_event)
         self.button.grid(row = 0, column = 1, sticky='ew')
         
+        
 
-
-class dataAnalysis(App):
-    pass
         
 app = App()
 app.mainloop()
+
 

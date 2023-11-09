@@ -1,0 +1,6 @@
+Future version additions
+
+0.0.2:
+
+Add recent button functionality in the file menu. This button should open a cascade menu with recent open files and the user can open 
+the listed recent files.
