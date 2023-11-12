@@ -4,8 +4,8 @@ import numpy as np
 def readData(raw_img_dir):
     # reads the data and returns a 3 D numpy array
     spectral_array = pcv.readimage(raw_img_dir, mode = 'envi')
-    spectral_array = spectral_array.array_data
-    return spectral_array
+    spectral_array_data = spectral_array.array_data
+    return spectral_array_data
     
 
 def create_pseudo_rgb(arr, r_band, g_band, b_band):
@@ -25,3 +25,7 @@ def single_band(arr, band):
     band = (arr[:,:,band] - np.min(arr[:,:,band])) / (np.max(arr[:,:,band]) - np.min(arr[:,:,band])) * 255
     
     return band.astype(np.uint8)
+
+
+
+ 
