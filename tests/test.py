@@ -172,6 +172,44 @@ class App(ctk.CTk):
                                      border_width= 1,
                                      expand = False)
         
+        data_path_file = os.path.join('history', 'img_dir_record.txt') 
+        
+        if os.path.exists(data_path_file) and os.path.getsize(data_path_file) == 0:
+            lightThemeImgPath = 'data/welcomeLight.png'
+            darkThemeImgPath = 'data/welcomeDark.png'
+            if ctk.get_appearance_mode() == 'Light': 
+                welcomeImg = Image.open(lightThemeImgPath)
+                
+            
+            else:
+                welcomeImg = Image.open(darkThemeImgPath)
+                
+
+            homeCanvas = ctk.CTkCanvas(self.leftFrameTop, 
+                            bg = self.rgbValues(),
+                            bd =0,
+                            highlightthickness=0,
+                            relief='ridge')
+            
+            homeCanvas.pack(expand=True, fill='both')
+            homeCanvas.bind('<Configure>',lambda event: self.full_image(event, welcomeImg, canvas=homeCanvas))
+            
+        elif os.path.exists(data_path_file) and os.path.getsize(data_path_file) > 0:
+            with open(data_path_file, 'r') as f:
+                self.raw_img_dir = f.read().strip()
+                homeCanvas = ctk.CTkCanvas(self.leftFrameTop, 
+                        bg = self.rgbValues(),
+                        bd =0,
+                        highlightthickness=0,
+                        relief='ridge')
+        
+                homeCanvas.pack(expand=True, fill='both')
+                homeCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas=homeCanvas))
+                homeCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = homeCanvas, image = self.tk_image))
+        else:
+            pass
+            
+
         # left side slider and slider label
         self.slider = ctk.CTkSlider(self.leftFrameBottom, from_ = 0, to = 223,
                                 height = 30, command = self.slider_event)
@@ -181,13 +219,14 @@ class App(ctk.CTk):
                                                     justify = "center")
         self.sliderCurrentValueLabel.pack(side='bottom', expand =False, fill='x')
         self.slider_event(220)
-        
+            
         
         ## children to righFrame
         self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 1)
         self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 1)
         
         # right side plot and labels
+        #### scatter plot ######
         self.wavelengthPlotFigLabel = ctk.CTkLabel(master = self.rightFrameTop, 
                                                     text = "Wavelength Plots", 
                                                     justify = "center")
@@ -198,17 +237,8 @@ class App(ctk.CTk):
         self.wavelengthPlotFigCanvas = FigureCanvasTkAgg(self.wavelengthPlotFig, master= self.rightFrameTop)
         self.wavelengthPlotFigCanvas.get_tk_widget().pack(side = 'top', fill='both', expand=True)
 
-
         
-        
-        
-        
-        
-        
-        
-        
-        
-
+        #### scatter plot ######
         self.scatterPlotFigLabel = ctk.CTkLabel(master = self.rightFrameBottom, 
                                                     text = "Scatter Plot", 
                                                     justify = "center")
@@ -219,26 +249,17 @@ class App(ctk.CTk):
         scatterPlotFigCanvas = FigureCanvasTkAgg(scatterPlotFig, master= self.rightFrameBottom)
         scatterPlotFigCanvas.get_tk_widget().pack(side = 'top', fill='both', expand=True)
         
+
+                
         
+        # Check if the txt file in history/img_dir_record.txt is empty or not
+        # this code makes sure that if the image is 
+
+         
         
+
+    
         
-        # # Check if the txt file in history/img_dir_record.txt is empty or not
-        # # this code makes sure that if the image is 
-        # data_path_file = os.path.join('history', 'img_dir_record.txt')
-        # if os.path.exists(data_path_file) and os.path.getsize(data_path_file) > 0:
-        #     with open(data_path_file, 'r') as f:
-        #         self.raw_img_dir = f.read().strip()
-        #         HomeCanvas = ctk.CTkCanvas(self.leftFrameTop, 
-        #                 bg = self.rgbValues(),
-        #                 bd =0,
-        #                 highlightthickness=0,
-        #                 relief='ridge')
-        
-        #         HomeCanvas.pack(expand=True, fill='both')
-        #         HomeCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas=HomeCanvas))
-       
-        # else:
-        #     self.raw_img_dir = None
             
             
 
@@ -316,28 +337,16 @@ class App(ctk.CTk):
         with open(os.path.join('history', 'recentFiles.txt'), 'w') as f:
             for line in lines:
                 f.write(line + '\n')
+                
+        self.slider_event(value=220)
 
     
     def slider_event(self, value):
         
         if self.raw_img_dir == None:
-            
-            # Open the GIF file
-            gif = Image.open('data/welcome.gif')
-            # Convert the GIF into a list of frames
-            frames = [frame.copy() for frame in ImageSequence.Iterator(gif)]
-            # Scale the slider value to the range of the GIF frames
-            scaled_value = int(value * len(frames) / 224)
-            # Ensure that the scaled value is at least 0
-            scaled_value = max(0, scaled_value)
-            # Select a single frame (band) based on the slider value
-            single_band_img = frames[scaled_value]
-            
-            # Convert the single band image to a format that can be displayed in Tkinter
-            self.tk_image = Image.fromarray(np.uint8(single_band_img))
-            
-            
-            
+            pass
+
+  
         else:
             
             self.spectral_array = readData(self.raw_img_dir)
@@ -346,68 +355,34 @@ class App(ctk.CTk):
             
             self.tk_image = Image.fromarray(np.uint8(single_band_img))
 
-        # updates the current slider value
-        self.sliderCurrentValueLabel.configure(text= "Current Wavelength: " + str(int(value)))
-        
-  
-        # destroy the left frame for new image
-        for widget in self.leftFrameTop.winfo_children():
-            widget.destroy()
-        
-        openCanvas = ctk.CTkCanvas(self.leftFrameTop, 
-                        bg = self.rgbValues(),
-                        bd =0,
-                        highlightthickness=0,
-                        relief='ridge')
+            # updates the current slider value
+            self.sliderCurrentValueLabel.configure(text= "Current Wavelength: " + str(int(value)))
+            
     
-        # makes sure that the new image is displayed as "fit" within the frame.
-        openCanvas.pack(side = 'top', expand=True, fill='both')
-      
-        openCanvas.bind('<Configure>',lambda event: self.full_image(event,self.tk_image, canvas = openCanvas))
-        openCanvas.bind('<1>', lambda event: self.wavelengthPlot_on_image_click(event, canvas = openCanvas, image = self.tk_image))
-        # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
-        # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
-        # run the self.full_image function”.
+            # destroy the left frame for new image
+            for widget in self.leftFrameTop.winfo_children():
+                widget.destroy()
+            
+            openCanvas = ctk.CTkCanvas(self.leftFrameTop, 
+                            bg = self.rgbValues(),
+                            bd =0,
+                            highlightthickness=0,
+                            relief='ridge')
         
-    # def wavelengthPlot_on_image_click(self,event, canvas, image):
-    #     # The event object contains the x and y coordinates of the mouse click
-    #     x, y = int(event.x), int(event.y)
+            # makes sure that the new image is displayed as "fit" within the frame.
+            openCanvas.pack(side = 'top', expand=True, fill='both')
         
-    #     print("Spectral array size", self.spectral_array.shape)
-    #     print("eventx: ", event.x,"and eventy: ", event.y)
-    #     print("Image size 0: ", image.size[0], "and 1: ", image.size[1])
-    #     print("canvas width: ", canvas.winfo_width(),"and height: ", canvas.winfo_height())
-    #     print("Image width: ", image.width, "and height ", image.height)
-    #     # Update the canvas's size
-    #     canvas.update_idletasks()
-    
-    #     # Calculate the size of the borders
-    #     border_x = (canvas.winfo_width() - image.width)
-    #     border_y = (canvas.winfo_height() - image.height)
-        
-    #     print("border x: ", border_x,"and y: " ,border_y )
+            openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
+            openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image))
+            # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
+            # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
+            # run the self.full_image function”.
+            
 
-    #     # Adjust the coordinates
-    #     x -= border_x
-    #     y -= border_y
-    #     print("adjusted x: ", x,"adjusted y: " ,y )
-        
-        
-        
-    #     # print(x,y)
-    #     # Make sure the coordinates are within the image
-    #     if 0 <= x < self.spectral_array.shape[1] and 0 <= y < self.spectral_array.shape[0]:
-            
-    #         print(f"You clicked at ({y}, {x}) on the image")
-    #         reflectance = self.spectral_array[int(y), int(x), :]
-    #         self.wavelengthPlotFigax.clear()
-    #         self.wavelengthPlotFigax.plot(np.arange(1, 225), reflectance)
-    #         self.wavelengthPlotFigCanvas.draw()
-    #     else:
-    #         print("You clicked outside the image")
-            
+  
+    def getresizedImageCoordinates(self,event, canvas, image):
     
-    def wavelengthPlot_on_image_click(self,event, canvas, image):
+    
         # The event object contains the x and y coordinates of the mouse click
         x, y = int(event.x), int(event.y)
         
@@ -440,7 +415,7 @@ class App(ctk.CTk):
             elif int(border_x) <= x <= (int(border_x) + self.resized_tk.width()):
                 imgX = x-int(border_x)
                 imgY = y-int(border_y)
-          
+        
                 
                 x_scale_ratio = image.width / self.resized_tk.width()
                 y_scale_ratio = image.height / self.resized_tk.height()
@@ -449,7 +424,8 @@ class App(ctk.CTk):
                 scaled_imgY = round(imgY * y_scale_ratio)
                 self.wavelengthplot(scaled_imgX, scaled_imgY)
                 
-            
+                
+                
     def wavelengthplot(self,scaled_imgX, scaled_imgY):
         reflectance = self.spectral_array[int(scaled_imgY), int(scaled_imgX), :]
         self.wavelengthPlotFigax.clear()
@@ -459,7 +435,7 @@ class App(ctk.CTk):
 
 
     def about(self):
-        aboutImgpath= 'data/HerschelVisionAbout.png'
+        aboutImgpath= 'data/about.png'
         # creates a new top level tkinter window.
         about_window = ctk.CTkToplevel(self)
         about_window.transient(self) 
