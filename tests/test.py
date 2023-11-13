@@ -163,7 +163,7 @@ class App(ctk.CTk):
         self.rightFrame = frame(master=self.workAreaFrame, side='right', border_width= 1)
         
 
-        ## children to righFrame
+        ## children to leftFrame
         self.leftFrameTop = frame(master=self.leftFrame, 
                                   side='top', 
                                   border_width= 1)
@@ -174,6 +174,7 @@ class App(ctk.CTk):
         
         data_path_file = os.path.join('history', 'img_dir_record.txt') 
         
+        # if the img_dir_record is empty. show the welcome image
         if os.path.exists(data_path_file) and os.path.getsize(data_path_file) == 0:
             lightThemeImgPath = 'data/welcomeLight.png'
             darkThemeImgPath = 'data/welcomeDark.png'
@@ -193,7 +194,7 @@ class App(ctk.CTk):
             
             homeCanvas.pack(expand=True, fill='both')
             homeCanvas.bind('<Configure>',lambda event: self.full_image(event, welcomeImg, canvas=homeCanvas))
-            
+        
         elif os.path.exists(data_path_file) and os.path.getsize(data_path_file) > 0:
             with open(data_path_file, 'r') as f:
                 self.raw_img_dir = f.read().strip()
@@ -211,19 +212,31 @@ class App(ctk.CTk):
             
 
         # left side slider and slider label
-        self.slider = ctk.CTkSlider(self.leftFrameBottom, from_ = 0, to = 223,
-                                height = 30, command = self.slider_event)
-        self.slider.pack(side='bottom', expand = False, fill ='x')
-        self.sliderCurrentValueLabel = ctk.CTkLabel(master = self.leftFrameBottom, 
+        self.wavelengthSlider = ctk.CTkSlider(self.leftFrameBottom, from_ = 0, to = 223,
+                                height = 30, command = self.wavelengthsSlider_event)
+        self.wavelengthSlider.pack(side='bottom', expand = False, fill ='x')
+        self.wavelengthSliderCurrentValueLabel = ctk.CTkLabel(master = self.leftFrameBottom, 
                                                     text = "", 
                                                     justify = "center")
-        self.sliderCurrentValueLabel.pack(side='bottom', expand =False, fill='x')
-        self.slider_event(220)
+        self.wavelengthSliderCurrentValueLabel.pack(side='bottom', expand =False, fill='x')
+        self.wavelengthsSlider_event(220)
+            
             
         
+        
+        
         ## children to righFrame
-        self.rightFrameTop = frame(master=self.rightFrame, side='top', border_width= 1)
-        self.rightFrameBottom = frame(master=self.rightFrame, side='top', border_width= 1)
+        self.rightFrameTop = frame(master=self.rightFrame, 
+                                   side='top', 
+                                   border_width= 1)
+        self.rightFrameMiddle = frame(master=self.rightFrame, 
+                                      side='top', 
+                                      border_width= 1)
+        self.rightFrameBottom = frame(master=self.rightFrame, 
+                                   side='top', 
+                                   border_width= 1,
+                                   expand = False)
+   
         
         # right side plot and labels
         #### scatter plot ######
@@ -235,27 +248,48 @@ class App(ctk.CTk):
         self.wavelengthPlotFig.set_facecolor(self.rgbValues())
         self.wavelengthPlotFigax.set_facecolor(self.rgbValues())
         self.wavelengthPlotFigCanvas = FigureCanvasTkAgg(self.wavelengthPlotFig, master= self.rightFrameTop)
-        self.wavelengthPlotFigCanvas.get_tk_widget().pack(side = 'top', fill='both', expand=True)
+        self.wavelengthPlotFigCanvas.get_tk_widget().pack(side = 'top', fill='x', expand=False)
 
+
+        # self.rightFrameBottomScatter = frame(master=self.rightFrameBottom, side='top', border_width= 0)
+        # self.rightFrameBottomSlider = frame(master=self.rightFrameBottom, side='top', border_width= 0, expand = False, fill ='x')
         
+    
         #### scatter plot ######
-        self.scatterPlotFigLabel = ctk.CTkLabel(master = self.rightFrameBottom, 
+        self.scatterPlotFigLabel = ctk.CTkLabel(master = self.rightFrameMiddle, 
                                                     text = "Scatter Plot", 
                                                     justify = "center")
         self.scatterPlotFigLabel.pack(side='top', expand = False, fill='x')
-        scatterPlotFig, scatterPlotFigax = plt.subplots()
-        scatterPlotFig.set_facecolor(self.rgbValues())
-        scatterPlotFigax.set_facecolor(self.rgbValues())
-        scatterPlotFigCanvas = FigureCanvasTkAgg(scatterPlotFig, master= self.rightFrameBottom)
-        scatterPlotFigCanvas.get_tk_widget().pack(side = 'top', fill='both', expand=True)
-        
+        self.scatterPlotFig, self.scatterPlotFigax = plt.subplots()
+        self.scatterPlotFig.set_facecolor(self.rgbValues())
+        self.scatterPlotFigax.set_facecolor(self.rgbValues())
+        self.scatterPlotFigCanvas = FigureCanvasTkAgg(self.scatterPlotFig, master= self.rightFrameMiddle)
+        self.scatterPlotFigCanvas.get_tk_widget().pack(side = 'top', fill='x', expand=True)
 
-                
-        
-        # Check if the txt file in history/img_dir_record.txt is empty or not
-        # this code makes sure that if the image is 
 
-         
+
+    # Configure the rows and columns of the grid
+        self.rightFrameBottom.grid_rowconfigure(0, weight=1)    # Makes the row expandable
+        self.rightFrameBottom.grid_columnconfigure(0, weight=1) # Makes the first column expandable
+        self.rightFrameBottom.grid_columnconfigure(1, weight=1) # Makes the second column expandable
+
+        # right scatter slider and slider label for first band
+        self.band1ScatterSlider = ctk.CTkSlider(self.rightFrameBottom, from_ = 0, to = 223,
+                                height = 30, command = self.band1ScatterSlider_event)
+        self.band1ScatterSlider.grid(row =0, column =0, sticky ='ew',padx = (150,50))
+        self.band1ScatterSlider_event(220)
+        
+        
+        # right scatter slider and slider label for second band
+        self.band2ScatterSlider = ctk.CTkSlider(self.rightFrameBottom, from_ = 0, to = 223,
+                                height = 30, command = self.band2ScatterSlider_event)
+        self.band2ScatterSlider.grid(row =0, column=1, sticky='ew',padx = (50,150))
+        self.band2ScatterSlider_event(220)
+
+        
+        self.band1Value = 150
+        self.band2Value = 150
+        
         
 
     
@@ -338,10 +372,14 @@ class App(ctk.CTk):
             for line in lines:
                 f.write(line + '\n')
                 
-        self.slider_event(value=220)
+        self.wavelengthsSlider_event(value=220)
+        
+        self.kmeanslabels, self.unfoldedData = scatterPlotData(self.raw_img_dir)
+   
+        
 
     
-    def slider_event(self, value):
+    def wavelengthsSlider_event(self, value):
         
         if self.raw_img_dir == None:
             pass
@@ -356,7 +394,7 @@ class App(ctk.CTk):
             self.tk_image = Image.fromarray(np.uint8(single_band_img))
 
             # updates the current slider value
-            self.sliderCurrentValueLabel.configure(text= "Current Wavelength: " + str(int(value)))
+            self.wavelengthSliderCurrentValueLabel.configure(text= "Current Wavelength: " + str(int(value)))
             
     
             # destroy the left frame for new image
@@ -378,6 +416,31 @@ class App(ctk.CTk):
             # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
             # run the self.full_image function”.
             
+            
+    def band1ScatterSlider_event(self, value):
+        if self.raw_img_dir == None:
+            pass
+        else:
+            self.band1Value= int(value)
+            self.scatterPlotFigax.clear()
+            self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], self.unfoldedData[:,self.band2Value], c=self.kmeanslabels, s=2)
+            self.scatterPlotFigax.figure.canvas.draw()
+
+        
+
+
+    
+    def band2ScatterSlider_event(self, value):
+        if self.raw_img_dir == None:
+            pass
+        else:
+            self.band2Value = int(value)
+            self.scatterPlotFigax.clear()
+            self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], self.unfoldedData[:,self.band2Value], c=self.kmeanslabels, s=2)
+            self.scatterPlotFigax.figure.canvas.draw()
+        
+        
+
 
   
     def getresizedImageCoordinates(self,event, canvas, image):
@@ -404,7 +467,7 @@ class App(ctk.CTk):
                 
                 scaled_imgX = round(imgX * x_scale_ratio)
                 scaled_imgY = round(imgY * y_scale_ratio)
-                self.wavelengthplot(scaled_imgX, scaled_imgY)
+                self.wavelengthPlot(scaled_imgX, scaled_imgY)
                 
         
         elif border_y == 0:
@@ -422,17 +485,13 @@ class App(ctk.CTk):
                 
                 scaled_imgX = round(imgX * x_scale_ratio)
                 scaled_imgY = round(imgY * y_scale_ratio)
-                self.wavelengthplot(scaled_imgX, scaled_imgY)
+                self.wavelengthPlot(scaled_imgX, scaled_imgY)
                 
-                
-                
-    def wavelengthplot(self,scaled_imgX, scaled_imgY):
+    def wavelengthPlot(self,scaled_imgX, scaled_imgY):
         reflectance = self.spectral_array[int(scaled_imgY), int(scaled_imgX), :]
         self.wavelengthPlotFigax.clear()
         self.wavelengthPlotFigax.plot(np.arange(1, 225), reflectance)
         self.wavelengthPlotFigCanvas.draw()
-
-
 
     def about(self):
         aboutImgpath= 'data/about.png'
