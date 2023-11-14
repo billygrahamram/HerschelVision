@@ -393,6 +393,9 @@ class App(ctk.CTk):
             self.band1Value= int(value)
             self.scatterPlotFigax.clear()
             self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], self.unfoldedData[:,self.band2Value], c=self.kmeanslabels, s=2)
+            self.scatterPlotFigax.set_title("Scatter Plot")
+            self.scatterPlotFigax.set_xlabel("Band 1")
+            self.scatterPlotFigax.set_ylabel("Band 2")
             self.scatterPlotFigax.figure.canvas.draw()
     
     def band2ScatterSlider_event(self, value):
@@ -402,6 +405,9 @@ class App(ctk.CTk):
             self.band2Value = int(value)
             self.scatterPlotFigax.clear()
             self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], self.unfoldedData[:,self.band2Value], c=self.kmeanslabels, s=2)
+            self.scatterPlotFigax.set_title("Scatter Plot")
+            self.scatterPlotFigax.set_xlabel("Band 1")
+            self.scatterPlotFigax.set_ylabel("Band 2")
             self.scatterPlotFigax.figure.canvas.draw()
   
     def getresizedImageCoordinates(self,event, canvas, image):
@@ -452,6 +458,9 @@ class App(ctk.CTk):
         reflectance = self.spectral_array[int(scaled_imgY), int(scaled_imgX), :]
         self.wavelengthPlotFigax.clear()
         self.wavelengthPlotFigax.plot(np.arange(1, 225), reflectance)
+        self.wavelengthPlotFigax.set_title("Wavelength Plot")
+        self.wavelengthPlotFigax.set_xlabel("Wavelength")
+        self.wavelengthPlotFigax.set_ylabel("Reflectance")
         self.wavelengthPlotFigCanvas.draw()
 
     def about(self):
