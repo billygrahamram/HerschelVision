@@ -6,10 +6,12 @@
 ## This code solely belongs to Billy G. Ram and is currently NOT open sourced. 
 #####################################################################################
 
+import os
 import customtkinter as ctk
 import tkinter as tk
+import tkinter.ttk as ttk
 from PIL import Image, ImageTk, ImageSequence
-import os
+import time, threading
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import matplotlib.pyplot as plt
@@ -22,7 +24,7 @@ from readfile import *
 from plantcv import plantcv as pcv
 import numpy as np
 
-ctk.set_appearance_mode("dark") # light, dark, system
+ctk.set_appearance_mode("light") # light, dark, system
 
 def frame(master,
           corner_radius=0,
@@ -245,7 +247,7 @@ class App(ctk.CTk):
         self.wavelengthSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
                                  height=20,command = self.wavelengthsSlider_event)
         self.wavelengthSlider.grid(row = 1, column = 0, columnspan=2, padx = (100,5))
-        self.wavelengthsSlider_event(220)
+        self.wavelengthsSlider_event(112)
         
 
         
@@ -253,13 +255,13 @@ class App(ctk.CTk):
         self.band1ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
                                 height = 20, command = self.band1ScatterSlider_event)
         self.band1ScatterSlider.grid(row =1, column =2, padx = (100,5))
-        self.band1ScatterSlider_event(220)
+        self.band1ScatterSlider_event(112)
         
         # right scatter slider and slider label for second band
         self.band2ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
                                 height = 20, command = self.band2ScatterSlider_event)
         self.band2ScatterSlider.grid(row =1, column=3, padx=(5,15))
-        self.band2ScatterSlider_event(220)
+        self.band2ScatterSlider_event(112)
         
         self.band1Value = 150
         self.band2Value = 150
@@ -337,14 +339,67 @@ class App(ctk.CTk):
             for line in lines:
                 f.write(line + '\n')
                 
-        self.wavelengthsSlider_event(value=220)
         
+        self.Dataloaded = False
+        #using multithreading to show the loading dialog box while data is loading
+        self.process_thread = threading.Thread(target = self.loadData).start()
+        
+        self.dataLoadingScreen()
+        
+        
+        
+        
+        
+    def loadData(self):
+        self.loadDataText = 'Opening files...'
+        self.spectral_array = readData(self.raw_img_dir)
+        self.loadDataText = 'Loading data and creating plots...'
         self.kmeanslabels, self.unfoldedData = scatterPlotData(self.raw_img_dir)
+        self.loadDataText = 'Finishing up...'
+        self.wavelengthsSlider_event(value=112)
+        self.Dataloaded = True
         
-     
         
         
+    
+    def dataLoadingScreen(self):
+        
+         # creates a new top level tkinter window.
+        loading_window = tk.Toplevel(self)
+        loading_window.transient(self) 
+        loading_window.title("Loading data")
+        loading_window.geometry("500x200")
+        loading_window.resizable(width=False, height=False)
 
+        # routes all event for the app to loading window.
+        # user cannot intereact with app until loading window is closed.
+        loading_window.grab_set()
+        
+        # makes the popup window appear on top of the application window
+        # instead of a seperate desktop window.
+        loading_window.attributes('-topmost', True)
+        loading_window.after_idle(loading_window.attributes, '-topmost', False)
+        
+        self.loadDataLabel = ctk.CTkLabel(master=loading_window, text = self.loadDataText, justify = "center", font = ("Helvetica", 20))
+        self.loadDataLabel.pack(side = 'top', expand = True, fill = 'x', pady =(10,0))
+        
+        # Create a progress bar
+        progress = ctk.CTkProgressBar(loading_window, width = 150, height = 30, mode='indeterminate', orientation='horizontal')
+        progress.pack(side = 'top',expand=True, fill='x', padx = 80, pady=(0,80))
+        progress.start()
+
+        
+        def check_data_loaded():
+            if self.Dataloaded:
+                loading_window.destroy()
+                
+            else:
+                self.loadDataLabel.configure(text=self.loadDataText)
+                loading_window.after(1, check_data_loaded)
+                
+        check_data_loaded()
+        
+        
    
     def wavelengthsSlider_event(self, value):
         
@@ -352,7 +407,7 @@ class App(ctk.CTk):
             pass
         else:
             
-            self.spectral_array = readData(self.raw_img_dir)
+            
 
             single_band_img = single_band(self.spectral_array, int(value))
             
@@ -392,7 +447,9 @@ class App(ctk.CTk):
         else:
             self.band1Value= int(value)
             self.scatterPlotFigax.clear()
-            self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], self.unfoldedData[:,self.band2Value], c=self.kmeanslabels, s=2)
+            self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], 
+                                          self.unfoldedData[:,self.band2Value], 
+                                          c=self.kmeanslabels, s=10)
             self.scatterPlotFigax.set_title("Scatter Plot")
             self.scatterPlotFigax.set_xlabel("Band 1")
             self.scatterPlotFigax.set_ylabel("Band 2")
@@ -404,7 +461,9 @@ class App(ctk.CTk):
         else:
             self.band2Value = int(value)
             self.scatterPlotFigax.clear()
-            self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], self.unfoldedData[:,self.band2Value], c=self.kmeanslabels, s=2)
+            self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], 
+                                          self.unfoldedData[:,self.band2Value], 
+                                          c=self.kmeanslabels, s=10)
             self.scatterPlotFigax.set_title("Scatter Plot")
             self.scatterPlotFigax.set_xlabel("Band 1")
             self.scatterPlotFigax.set_ylabel("Band 2")
