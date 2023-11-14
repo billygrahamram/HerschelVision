@@ -24,6 +24,7 @@ from readfile import *
 from plantcv import plantcv as pcv
 import numpy as np
 
+
 ctk.set_appearance_mode("light") # light, dark, system
 
 def frame(master,
@@ -83,7 +84,11 @@ def button(master,
 def button_event():
     print("button pressed")
     
-    
+
+
+
+
+
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -97,9 +102,13 @@ class App(ctk.CTk):
         self.resizable(width=True, height=True)
 
     
+    
         ## self.raw_img_dir is the directory path for the image currently worked on.
         self.raw_img_dir = None
-   
+  
+
+
+
         
         # Empty the img_dir_record.txt file at startup. Opens and closes it, making the file empty.
         data_path_file = os.path.join('history', 'img_dir_record.txt')
@@ -115,7 +124,7 @@ class App(ctk.CTk):
 
         
         # opens the home window by default
-        
+
         self.mainMenu()
         self.homeWindow()
     
@@ -131,7 +140,7 @@ class App(ctk.CTk):
         self.EditOptionMenu.set("Edit")
         self.EditOptionMenu.pack(side= 'left',padx=5, pady=5)
         
-        self.ToolsOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
+        self.ToolsOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Segmentation", "Cropping","Preprocessing", "Preferences"], command=self.optionmenu_callback)
         self.ToolsOptionMenu.set("Tools")
         self.ToolsOptionMenu.pack(side= 'left',padx=5, pady=5)
 
@@ -179,7 +188,7 @@ class App(ctk.CTk):
         self.bottomSliderFrame.place(rely = 0.9, y = 0, relwidth = 1, relheight = 0.1)
 
 
-        self.rightPlotsImgFrame.rowconfigure((0,1,2,3,4,5,6,7,8,9), weight = 1)
+        self.rightPlotsImgFrame.rowconfigure((0,1), weight = 1)
         self.rightPlotsImgFrame.columnconfigure((0), weight = 1)
         self.bottomSliderFrame.rowconfigure((0,1), weight = 1)
         self.bottomSliderFrame.columnconfigure((0,1,2,3), weight = 1)
@@ -227,23 +236,24 @@ class App(ctk.CTk):
         self.wavelengthPlotFigax.set_xlabel("Wavelength")
         self.wavelengthPlotFigax.set_ylabel("Reflectance")
         self.wavelengthPlotFigCanvas = FigureCanvasTkAgg(self.wavelengthPlotFig, master= self.rightPlotsImgFrame)
-        self.wavelengthPlotFigCanvas.get_tk_widget().grid(row = 0, column = 0, rowspan=5, sticky= 'nsew')
+        self.wavelengthPlotFigCanvas.get_tk_widget().grid(row = 0, column = 0, sticky= 'nsew')
 
         #### scatter plot ######
         self.scatterPlotFig, self.scatterPlotFigax = plt.subplots()
         self.scatterPlotFig.set_facecolor(self.rgbValues())
         self.scatterPlotFigax.set_facecolor(self.rgbValues())
         self.scatterPlotFigax.set_title("Scatter Plot")
+
         self.scatterPlotFigax.set_xlabel("Band 1")
         self.scatterPlotFigax.set_ylabel("Band 2")
         self.scatterPlotFigCanvas = FigureCanvasTkAgg(self.scatterPlotFig, master= self.rightPlotsImgFrame)
-        self.scatterPlotFigCanvas.get_tk_widget().grid(row= 5, column=0, rowspan= 5, sticky='nsew')
+        self.scatterPlotFigCanvas.get_tk_widget().grid(row= 1, column=0,  sticky='nsew')
+
+
 
 
         self.wavelengthSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
         self.wavelengthSliderCurrentValueLabel.grid(row = 0, column =0, columnspan =2, padx = (100,5))
-        
-        
         self.wavelengthSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
                                  height=20,command = self.wavelengthsSlider_event)
         self.wavelengthSlider.grid(row = 1, column = 0, columnspan=2, padx = (100,5))
@@ -251,16 +261,21 @@ class App(ctk.CTk):
         
 
         
+        self.band1ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
+        self.band1ScatterSliderCurrentValueLabel.grid(row = 0, column =2, padx = (100,5))
         # right scatter slider and slider label for first band
         self.band1ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
                                 height = 20, command = self.band1ScatterSlider_event)
         self.band1ScatterSlider.grid(row =1, column =2, padx = (100,5))
         self.band1ScatterSlider_event(112)
         
+        
+        self.band2ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
+        self.band2ScatterSliderCurrentValueLabel.grid(row = 0, column =3, padx = (5,100))
         # right scatter slider and slider label for second band
         self.band2ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
                                 height = 20, command = self.band2ScatterSlider_event)
-        self.band2ScatterSlider.grid(row =1, column=3, padx=(5,15))
+        self.band2ScatterSlider.grid(row =1, column=3, padx=(5,100))
         self.band2ScatterSlider_event(112)
         
         self.band1Value = 150
@@ -271,7 +286,7 @@ class App(ctk.CTk):
         
         # this function takes in a image and calculates it's dimension and the window dimension
         # and then makes sure that the image is fit to the window frame.
-        
+       
         canvas_ratio = event.width / event.height
         img_ratio = tk_image.size[0]/tk_image.size[1]
         
@@ -289,8 +304,7 @@ class App(ctk.CTk):
             int(event.width/2), 
             int(event.height/2), 
             anchor = 'center',
-            image=self.resized_tk,
-            tag ='img')
+            image=self.resized_tk)
         canvas.image = self.resized_tk
         
     def open(self):
@@ -344,11 +358,7 @@ class App(ctk.CTk):
         #using multithreading to show the loading dialog box while data is loading
         self.process_thread = threading.Thread(target = self.loadData).start()
         
-        self.dataLoadingScreen()
-        
-        
-        
-        
+        self.dataLoadingScreen()  
         
     def loadData(self):
         self.loadDataText = 'Opening files...'
@@ -359,9 +369,6 @@ class App(ctk.CTk):
         self.wavelengthsSlider_event(value=112)
         self.Dataloaded = True
         
-        
-        
-    
     def dataLoadingScreen(self):
         
          # creates a new top level tkinter window.
@@ -399,8 +406,6 @@ class App(ctk.CTk):
                 
         check_data_loaded()
         
-        
-   
     def wavelengthsSlider_event(self, value):
         
         if self.raw_img_dir == None:
@@ -438,13 +443,12 @@ class App(ctk.CTk):
             # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
             # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
             # run the self.full_image function”.
-                   
-
 
     def band1ScatterSlider_event(self, value):
         if self.raw_img_dir == None:
             pass
         else:
+            self.band1ScatterSliderCurrentValueLabel.configure(text= "First Band: " + str(int(value)))
             self.band1Value= int(value)
             self.scatterPlotFigax.clear()
             self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], 
@@ -459,6 +463,7 @@ class App(ctk.CTk):
         if self.raw_img_dir == None:
             pass
         else:
+            self.band2ScatterSliderCurrentValueLabel.configure(text= "Second Band: " + str(int(value)))
             self.band2Value = int(value)
             self.scatterPlotFigax.clear()
             self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], 
@@ -565,10 +570,11 @@ class App(ctk.CTk):
 
         ## children to workMenuFrame 
         self.leftButtonsImgSegFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        self.leftButtonsImgSegFrame.place(x = 0, y = 0, relwidth = 0.2, relheight = 1)
         self.middleImgSegFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        self.middleImgSegFrame.place(relx = 0.2, y = 0, relwidth = 0.6, relheight = 1)
         self.rightImgSegFrame = ctk.CTkFrame(master = self.workAreaFrame)
+        
+        self.leftButtonsImgSegFrame.place(x = 0, y = 0, relwidth = 0.2, relheight = 1)
+        self.middleImgSegFrame.place(relx = 0.2, y = 0, relwidth = 0.4, relheight = 1)
         self.rightImgSegFrame.place(relx = 0.6, y = 0, relwidth = 0.4, relheight = 1)
     
 
@@ -585,15 +591,59 @@ class App(ctk.CTk):
 
         self.ImgSegOptions = ctk.CTkOptionMenu(master = self.leftButtonsImgSegFrame,
                                                 values = ["K-means clustering", 
-                                                          "Segment Anything"],command = self.optionmenu_callback)
+                                                          "Segment Anything"],command = self.preferenceOptions_callback)
         self.ImgSegOptions.set("Segmentation Models")
         self.ImgSegOptions.grid(row = 0, column = 0, sticky='ew', padx = 30, pady =100)
+        
         self.ImgSegParametersButton = ctk.CTkButton(master=self.leftButtonsImgSegFrame, text="Parameters", command=self.preferencesWindow)
         self.ImgSegParametersButton.grid(row = 1, column = 0, sticky='ew', padx = 30, pady = 100)
         
         
+        if self.raw_img_dir == None:
+            pass
+        else:
+            
+            for widget in self.middleImgSegFrame.winfo_children():
+                widget.destroy()
+            
+            segmentationCanvas = ctk.CTkCanvas(self.middleImgSegFrame,
+                            bg = self.rgbValues(),
+                            bd =0,
+                            highlightthickness=0,
+                            relief='ridge')
         
+            
+            segmentationCanvas.pack(expand =True, fill='both')
+            segmentationCanvas.bind('<Configure>',lambda event: self.full_image(event, tk_image= self.tk_image, canvas=segmentationCanvas))
+            
+            
+            
+    def preferenceOptions_callback(self, choice):
+        if choice == "K-means clustering":
+            print("k means pressed")
+        elif choice == "Segment Anything":
+            print("segment anything pressed")
+        elif choice == "Standard Normal Variate":
+            print("standard normal variate pressed")
+        elif choice == "Multiplicative Scatter Correction":
+            print("multiplicative scatter correction pressed")
+        elif choice == "Savitzky-Golay":
+            print("savitzky golay pressed")
+        elif choice == "Normalization":
+            print("normalization pressed")
+        elif choice == "ViT-H SAM Model":
+            print("vit h sam model pressed")
+        elif choice == "ViT-L SAM Model":
+            print("vit l sam model pressed")
+        elif choice == "ViT-B SAM Model":
+            print("vit b sam model pressed")
 
+      
+
+    
+            
+            
+            
     def preprocessingWindow(self):
         
         # Clear self.workAreaFrame
@@ -625,10 +675,10 @@ class App(ctk.CTk):
         ## label and dropdown for the preprocessing methods
 
         self.PreProOptions = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
-                                                values = ["SNV", 
-                                                          "MSC",
-                                                          "SG",
-                                                          "Normalize"],command = self.optionmenu_callback)
+                                                values = ["Standard Normal Variate", 
+                                                          "Multiplicative Scatter Correction",
+                                                          "Savitzky-Golay",
+                                                          "Normalization"],command = self.preferenceOptions_callback)
         self.PreProOptions.set("PreProcessing Methods")
         self.PreProOptions.grid(row = 0, column = 0, sticky='ew', padx = 30, pady =100)
         self.PreProParametersButton = ctk.CTkButton(master=self.leftButtonsPreProFrame, text="Parameters", command=self.preferencesWindow)
@@ -683,7 +733,7 @@ class App(ctk.CTk):
                                                 values = ["Standard Normal Variate", 
                                                           "Multiplicative Scatter Correction", 
                                                           "Savitzky-Golay", 
-                                                          "Normalization"],command = self.optionmenu_callback)
+                                                          "Normalization"],command = self.preferenceOptions_callback)
         self.ppModelOptions.set("Preprocessing Models")
         self.ppModelOptions.grid(row = 0, column = 1 ,padx=100, pady=(100,5), sticky = 'ew')
         
@@ -731,7 +781,7 @@ class App(ctk.CTk):
         self.segSAMModelOptions = ctk.CTkOptionMenu(master = self.SegmentationForm,
                                                 values = ["ViT-H SAM Model", 
                                                           "ViT-L SAM Model", 
-                                                          "ViT-B SAM Model"],command = self.optionmenu_callback)
+                                                          "ViT-B SAM Model"],command = self.preferenceOptions_callback)
         self.segSAMModelOptions.set("SAM Models")
         self.segSAMModelOptions.grid(row = 2, column = 1 ,padx=100, pady=5, sticky = 'ew')
          
