@@ -364,13 +364,16 @@ class App(ctk.CTk):
         self.loadDataText = 'Opening files...'
         self.spectral_array = readData(self.raw_img_dir)
         self.loadDataText = 'Loading data and creating plots...'
-        self.kmeanslabels, self.unfoldedData = scatterPlotData(self.raw_img_dir)
+        self.kmeanslabels, self.kmeansData = scatterPlotData(self.raw_img_dir)
+        self.loadDataText = 'Unfolding data...'
+        self.unfoldedData = unfold(self.spectral_array)
         self.loadDataText = 'Finishing up...'
         self.wavelengthsSlider_event(value=112)
         self.Dataloaded = True
         
     def dataLoadingScreen(self):
-        
+   
+            
          # creates a new top level tkinter window.
         loading_window = tk.Toplevel(self)
         loading_window.transient(self) 
@@ -451,8 +454,8 @@ class App(ctk.CTk):
             self.band1ScatterSliderCurrentValueLabel.configure(text= "First Band: " + str(int(value)))
             self.band1Value= int(value)
             self.scatterPlotFigax.clear()
-            self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], 
-                                          self.unfoldedData[:,self.band2Value], 
+            self.scatterPlotFigax.scatter(self.kmeansData[:, self.band1Value], 
+                                          self.kmeansData[:,self.band2Value], 
                                           c=self.kmeanslabels, s=10)
             self.scatterPlotFigax.set_title("Scatter Plot")
             self.scatterPlotFigax.set_xlabel("Band 1")
@@ -466,8 +469,8 @@ class App(ctk.CTk):
             self.band2ScatterSliderCurrentValueLabel.configure(text= "Second Band: " + str(int(value)))
             self.band2Value = int(value)
             self.scatterPlotFigax.clear()
-            self.scatterPlotFigax.scatter(self.unfoldedData[:, self.band1Value], 
-                                          self.unfoldedData[:,self.band2Value], 
+            self.scatterPlotFigax.scatter(self.kmeansData[:, self.band1Value], 
+                                          self.kmeansData[:,self.band2Value], 
                                           c=self.kmeanslabels, s=10)
             self.scatterPlotFigax.set_title("Scatter Plot")
             self.scatterPlotFigax.set_xlabel("Band 1")
@@ -650,39 +653,198 @@ class App(ctk.CTk):
         for widget in self.workAreaFrame.winfo_children():
             widget.destroy()
 
+        self.Dataloaded = False
         
         ## children to workMenuFrame 
         self.leftButtonsPreProFrame = ctk.CTkFrame(master = self.workAreaFrame)
         self.leftButtonsPreProFrame.place(x = 0, y = 0, relwidth = 0.2, relheight = 1)
         self.middlePreProFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        self.middlePreProFrame.place(relx = 0.2, y = 0, relwidth = 0.6, relheight = 1)
+        self.middlePreProFrame.place(relx = 0.2, y = 0, relwidth = 0.4, relheight = 1)
         self.rightPreProFrame = ctk.CTkFrame(master = self.workAreaFrame)
         self.rightPreProFrame.place(relx = 0.6, y = 0, relwidth = 0.4, relheight = 1)
     
 
         self.leftButtonsPreProFrame.rowconfigure((0,1,2,3,4,5,6,7), weight = 1)
-        self.rightPreProFrame.rowconfigure((0,1,2,3,4,5,6,7), weight = 1)
-        self.rightPreProFrame.columnconfigure((0,1), weight = 1)
+        # self.rightPreProFrame.rowconfigure((0,1,2,3,4,5,6,7), weight = 1)
+        # self.rightPreProFrame.columnconfigure((0,1), weight = 1)
         
-        
-
-        ## RIGHT BOTTOM Buttons
-        self.saveImgasNPYButton(master = self.rightPreProFrame)
-        self.saveUnfoldDatButton(master = self.rightPreProFrame)
         
         ## LEFT SIDE BUTTONS
         ## children to leftButtonsFrame. Preferences buttons
         ## label and dropdown for the preprocessing methods
+        
+        self.PreProOptionsInput = ctk.CTkLabel(master = self.leftButtonsPreProFrame,
+                                               text = "Input: Raw Data")
+        self.PreProOptionsInput.grid(row = 0, column = 0, sticky='ew', padx = 30, pady =(100,5))
 
-        self.PreProOptions = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
+        self.PreProOptions1 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
                                                 values = ["Standard Normal Variate", 
                                                           "Multiplicative Scatter Correction",
-                                                          "Savitzky-Golay",
-                                                          "Normalization"],command = self.preferenceOptions_callback)
-        self.PreProOptions.set("PreProcessing Methods")
-        self.PreProOptions.grid(row = 0, column = 0, sticky='ew', padx = 30, pady =100)
-        self.PreProParametersButton = ctk.CTkButton(master=self.leftButtonsPreProFrame, text="Parameters", command=self.preferencesWindow)
-        self.PreProParametersButton.grid(row = 1, column = 0, sticky='ew', padx = 30, pady = 100)
+                                                          "Savitzky-Golay (first)",
+                                                          "Savitzky-Golay (second)",
+                                                          "Normalization"],
+                                                command = lambda selection: self.preProcessingPipeLineSelection("option1", selection))
+        
+        self.PreProOptions1.set("Filter 1")
+        self.PreProOptions1.grid(row = 1, column = 0, sticky='ew', padx = 30, pady =(0,5))
+   
+        
+        self.PreProOptions2 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
+                                                values = ["Standard Normal Variate", 
+                                                          "Multiplicative Scatter Correction",
+                                                          "Savitzky-Golay (first)",
+                                                          "Savitzky-Golay (second)",
+                                                          "Normalization",
+                                                          "None (pass)"],
+                                                command = lambda selection: self.preProcessingPipeLineSelection("option2", selection))
+        self.PreProOptions2.set("Filter 2")
+        self.PreProOptions2.grid(row = 2, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        
+        self.PreProOptions3 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
+                                                values = ["Standard Normal Variate", 
+                                                          "Multiplicative Scatter Correction",
+                                                          "Savitzky-Golay (first)",
+                                                          "Savitzky-Golay (second)",
+                                                          "Normalization",
+                                                          "None (pass)"],
+                                                command = lambda selection: self.preProcessingPipeLineSelection("option3", selection))
+        self.PreProOptions3.set("Filter 3")
+        self.PreProOptions3.grid(row = 3, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        
+        self.PreProOptions4 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
+                                                values = ["Standard Normal Variate", 
+                                                          "Multiplicative Scatter Correction",
+                                                          "Savitzky-Golay (first)",
+                                                          "Savitzky-Golay (second)",
+                                                          "Normalization",
+                                                          "None (pass)"],
+                                                command = lambda selection: self.preProcessingPipeLineSelection("option4", selection))
+        self.PreProOptions4.set("Filter 4")
+        self.PreProOptions4.grid(row = 4, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        
+        
+        command = lambda selection: self.preProcessingPipeLineSelection("option4", selection)
+        
+        
+        self.PreProOptions5 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
+                                                values = ["Standard Normal Variate", 
+                                                          "Multiplicative Scatter Correction",
+                                                          "Savitzky-Golay (first)",
+                                                          "Savitzky-Golay (second)",
+                                                          "Normalization",
+                                                          "None (pass)"],
+                                                command = lambda selection: self.preProcessingPipeLineSelection("option5", selection))
+        self.PreProOptions5.set("Filter 5")
+        self.PreProOptions5.grid(row = 5, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        
+        self.PreProOptionsOutput = ctk.CTkLabel(master = self.leftButtonsPreProFrame,
+                                               text = "Output: Preprocessed Data")
+        self.PreProOptionsOutput.grid(row = 6, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        
+        self.PreProParametersButton = ctk.CTkButton(master=self.leftButtonsPreProFrame, 
+                                                    text="Apply Preprocessing", 
+                                                    command = self.applyPreprocessing)
+        self.PreProParametersButton.grid(row = 7, column = 0, sticky='ew', padx = 30, pady = (0,100))
+        
+        
+        
+        
+        
+        
+        
+        
+        self.rawPlotFig, self.rawPlotFigax = plt.subplots(figsize =(10,5), dpi =40)
+        self.rawPlotFig.set_facecolor(self.rgbValues())
+        self.rawPlotFigax.set_facecolor(self.rgbValues())
+        self.rawPlotFigax.set_title("Raw Spectral Signature")
+        self.rawPlotFigax.set_xlabel("Wavelength")
+        self.rawPlotFigax.set_ylabel("Reflectance")
+        self.rawPlotFigCanvas = FigureCanvasTkAgg(self.rawPlotFig, master= self.middlePreProFrame)
+        self.rawPlotFigCanvas.get_tk_widget().pack(expand = True, fill ='x')
+        
+        self.rawSpectralPlot(self.unfoldedData)
+        
+        self.preProcessedPlotFig, self.preProcessedPlotFigax = plt.subplots(figsize =(10,5), dpi = 40)
+        self.preProcessedPlotFig.set_facecolor(self.rgbValues())
+        self.preProcessedPlotFigax.set_facecolor(self.rgbValues())
+        self.preProcessedPlotFigax.set_title("Preprocessed Signature")
+        self.preProcessedPlotFigax.set_xlabel("Wavelength")
+        self.preProcessedPlotFigax.set_ylabel("Reflectance")
+        self.preProcessedPlotFigCanvas = FigureCanvasTkAgg(self.preProcessedPlotFig, master= self.rightPreProFrame)
+        self.preProcessedPlotFigCanvas.get_tk_widget().pack(expand = True, fill ='x')
+        
+        
+        
+    
+    def preProcessingPipeLineSelection(self, source, selection):
+        print(f"Selection from {source}: {selection}")
+        if source == "option1":
+            self.filter1 = selection
+        elif source == "option2":
+            self.filter2 = selection
+        elif source == "option3":
+            self.filter3 = selection
+        elif source == "option4":
+            self.filter4 = selection
+        elif source == "option5":
+            self.filter5 = selection
+        else:
+            pass
+            
+    def applyPreprocessing(self):
+        
+        def preprocessing_in_thread():
+            self.dataLoadingScreen()
+            self.loadDataText = 'Loading...'
+            rawdata = self.unfoldedData
+            self.loadDataText = f'Applying {self.filter1} ...'
+            filter1data = preprocessing(self.filter1, rawdata)
+            self.loadDataText = f'Applying {self.filter2} ...'
+            filter2data = preprocessing(self.filter2, filter1data)
+            self.loadDataText = f'Applying {self.filter3} ...'
+            filter3data = preprocessing(self.filter3, filter2data)
+            self.loadDataText = f'Applying {self.filter4} ...'
+            filter4data = preprocessing(self.filter4, filter3data)
+            self.loadDataText = f'Applying {self.filter5} ...'
+            preprocessedData = preprocessing(self.filter5, filter4data)
+            self.preprocessedSpectralPlot(preprocessedData)
+            self.Dataloaded = True
+        
+        self.dataLoadingScreen()
+        threading.Thread(target = preprocessing_in_thread).start()
+
+    def rawSpectralPlot(self, spectral_array):
+        
+        indices = np.random.choice(spectral_array.shape[0], size=50, replace=False)
+        selected_rows = spectral_array[indices]
+        self.rawPlotFigax.clear()
+        for i, row in enumerate(selected_rows):
+            self.rawPlotFigax.plot(np.arange(1, 225), row, label=f'Row {indices[i]}')
+        self.rawPlotFigax.set_title("Raw Spectral Signature")
+        self.rawPlotFigax.set_xlabel("Wavelength")
+        self.rawPlotFigax.set_ylabel("Reflectance")
+        self.rawPlotFigCanvas.draw()
+        
+    def preprocessedSpectralPlot(self, spectral_array):
+        
+        indices = np.random.choice(spectral_array.shape[0], size=50, replace=False)
+        selected_rows = spectral_array[indices]
+        self.preProcessedPlotFigax.clear()
+        for i, row in enumerate(selected_rows):
+            self.preProcessedPlotFigax.plot(np.arange(1, 225), row, label=f'Row {indices[i]}')
+        self.preProcessedPlotFigax.set_title("Preprocessed Signature")
+        self.preProcessedPlotFigax.set_xlabel("Wavelength")
+        self.preProcessedPlotFigax.set_ylabel("Reflectance")
+        self.preProcessedPlotFigCanvas.draw()
+
+
+        
+        
+        
+        
+        
+        
+        
         
     def preferencesWindow(self): # the settings window that allows the user to input/select variables for analysis inputs.
         
