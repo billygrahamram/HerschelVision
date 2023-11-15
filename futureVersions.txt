@@ -4,3 +4,6 @@ Future version additions
 
 Add recent button functionality in the file menu. This button should open a cascade menu with recent open files and the user can open 
 the listed recent files.
+
+Add Multiplicative scatter correction as a preprocessing method only if demanded by users. Currently, MSC was removed
+due to the computational load of it's calculation on large HSI iamges.

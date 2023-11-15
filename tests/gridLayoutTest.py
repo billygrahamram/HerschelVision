@@ -405,7 +405,7 @@ class App(ctk.CTk):
                 
             else:
                 self.loadDataLabel.configure(text=self.loadDataText)
-                loading_window.after(1, check_data_loaded)
+                loading_window.after(50, check_data_loaded) #keep checking after 50ms
                 
         check_data_loaded()
         
@@ -414,9 +414,6 @@ class App(ctk.CTk):
         if self.raw_img_dir == None:
             pass
         else:
-            
-            
-
             single_band_img = single_band(self.spectral_array, int(value))
             
             self.tk_image = Image.fromarray(np.uint8(single_band_img))
@@ -628,8 +625,6 @@ class App(ctk.CTk):
             print("segment anything pressed")
         elif choice == "Standard Normal Variate":
             print("standard normal variate pressed")
-        elif choice == "Multiplicative Scatter Correction":
-            print("multiplicative scatter correction pressed")
         elif choice == "Savitzky-Golay":
             print("savitzky golay pressed")
         elif choice == "Normalization":
@@ -653,7 +648,7 @@ class App(ctk.CTk):
         for widget in self.workAreaFrame.winfo_children():
             widget.destroy()
 
-        self.Dataloaded = False
+        
         
         ## children to workMenuFrame 
         self.leftButtonsPreProFrame = ctk.CTkFrame(master = self.workAreaFrame)
@@ -679,7 +674,7 @@ class App(ctk.CTk):
 
         self.PreProOptions1 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
                                                 values = ["Standard Normal Variate", 
-                                                          "Multiplicative Scatter Correction",
+                                                          
                                                           "Savitzky-Golay (first)",
                                                           "Savitzky-Golay (second)",
                                                           "Normalization"],
@@ -691,7 +686,7 @@ class App(ctk.CTk):
         
         self.PreProOptions2 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
                                                 values = ["Standard Normal Variate", 
-                                                          "Multiplicative Scatter Correction",
+                                                          
                                                           "Savitzky-Golay (first)",
                                                           "Savitzky-Golay (second)",
                                                           "Normalization",
@@ -702,7 +697,7 @@ class App(ctk.CTk):
         
         self.PreProOptions3 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
                                                 values = ["Standard Normal Variate", 
-                                                          "Multiplicative Scatter Correction",
+                                                         
                                                           "Savitzky-Golay (first)",
                                                           "Savitzky-Golay (second)",
                                                           "Normalization",
@@ -713,7 +708,7 @@ class App(ctk.CTk):
         
         self.PreProOptions4 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
                                                 values = ["Standard Normal Variate", 
-                                                          "Multiplicative Scatter Correction",
+                                                         
                                                           "Savitzky-Golay (first)",
                                                           "Savitzky-Golay (second)",
                                                           "Normalization",
@@ -722,29 +717,23 @@ class App(ctk.CTk):
         self.PreProOptions4.set("Filter 4")
         self.PreProOptions4.grid(row = 4, column = 0, sticky='ew', padx = 30, pady =(0,5))
         
+
         
-        command = lambda selection: self.preProcessingPipeLineSelection("option4", selection)
-        
-        
-        self.PreProOptions5 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
-                                                values = ["Standard Normal Variate", 
-                                                          "Multiplicative Scatter Correction",
-                                                          "Savitzky-Golay (first)",
-                                                          "Savitzky-Golay (second)",
-                                                          "Normalization",
-                                                          "None (pass)"],
-                                                command = lambda selection: self.preProcessingPipeLineSelection("option5", selection))
-        self.PreProOptions5.set("Filter 5")
-        self.PreProOptions5.grid(row = 5, column = 0, sticky='ew', padx = 30, pady =(0,5))
+    
         
         self.PreProOptionsOutput = ctk.CTkLabel(master = self.leftButtonsPreProFrame,
                                                text = "Output: Preprocessed Data")
-        self.PreProOptionsOutput.grid(row = 6, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        self.PreProOptionsOutput.grid(row = 5, column = 0, sticky='ew', padx = 30, pady =(0,5))
         
-        self.PreProParametersButton = ctk.CTkButton(master=self.leftButtonsPreProFrame, 
+        self.PreProApplyButton = ctk.CTkButton(master=self.leftButtonsPreProFrame, 
                                                     text="Apply Preprocessing", 
                                                     command = self.applyPreprocessing)
-        self.PreProParametersButton.grid(row = 7, column = 0, sticky='ew', padx = 30, pady = (0,100))
+        self.PreProApplyButton.grid(row = 6, column = 0, sticky='ew', padx = 30, pady = (0,5))
+        
+        self.PreProSaveButton = ctk.CTkButton(master=self.leftButtonsPreProFrame, 
+                                                    text="Save Preprocessed Data", 
+                                                    command = self.savePreprocessedData)
+        self.PreProSaveButton.grid(row = 7, column = 0, sticky='ew', padx = 30, pady = (0,100))
         
         
         
@@ -753,7 +742,7 @@ class App(ctk.CTk):
         
         
         
-        self.rawPlotFig, self.rawPlotFigax = plt.subplots(figsize =(10,5), dpi =40)
+        self.rawPlotFig, self.rawPlotFigax = plt.subplots(figsize =(10,10), dpi =40)
         self.rawPlotFig.set_facecolor(self.rgbValues())
         self.rawPlotFigax.set_facecolor(self.rgbValues())
         self.rawPlotFigax.set_title("Raw Spectral Signature")
@@ -762,9 +751,8 @@ class App(ctk.CTk):
         self.rawPlotFigCanvas = FigureCanvasTkAgg(self.rawPlotFig, master= self.middlePreProFrame)
         self.rawPlotFigCanvas.get_tk_widget().pack(expand = True, fill ='x')
         
-        self.rawSpectralPlot(self.unfoldedData)
         
-        self.preProcessedPlotFig, self.preProcessedPlotFigax = plt.subplots(figsize =(10,5), dpi = 40)
+        self.preProcessedPlotFig, self.preProcessedPlotFigax = plt.subplots(figsize =(10,10), dpi = 40)
         self.preProcessedPlotFig.set_facecolor(self.rgbValues())
         self.preProcessedPlotFigax.set_facecolor(self.rgbValues())
         self.preProcessedPlotFigax.set_title("Preprocessed Signature")
@@ -773,7 +761,10 @@ class App(ctk.CTk):
         self.preProcessedPlotFigCanvas = FigureCanvasTkAgg(self.preProcessedPlotFig, master= self.rightPreProFrame)
         self.preProcessedPlotFigCanvas.get_tk_widget().pack(expand = True, fill ='x')
         
-        
+        if self.raw_img_dir == None:
+            pass
+        else:
+            self.rawSpectralPlot(self.unfoldedData)
         
     
     def preProcessingPipeLineSelection(self, source, selection):
@@ -786,36 +777,54 @@ class App(ctk.CTk):
             self.filter3 = selection
         elif source == "option4":
             self.filter4 = selection
-        elif source == "option5":
-            self.filter5 = selection
         else:
             pass
             
     def applyPreprocessing(self):
         
         def preprocessing_in_thread():
-            self.dataLoadingScreen()
             self.loadDataText = 'Loading...'
-            rawdata = self.unfoldedData
+            
             self.loadDataText = f'Applying {self.filter1} ...'
-            filter1data = preprocessing(self.filter1, rawdata)
+            filter1data = preprocessing(self.filter1, self.unfoldedData)
             self.loadDataText = f'Applying {self.filter2} ...'
             filter2data = preprocessing(self.filter2, filter1data)
             self.loadDataText = f'Applying {self.filter3} ...'
             filter3data = preprocessing(self.filter3, filter2data)
             self.loadDataText = f'Applying {self.filter4} ...'
-            filter4data = preprocessing(self.filter4, filter3data)
-            self.loadDataText = f'Applying {self.filter5} ...'
-            preprocessedData = preprocessing(self.filter5, filter4data)
-            self.preprocessedSpectralPlot(preprocessedData)
+            self.preprocessedData = preprocessing(self.filter4, filter3data)
+            self.loadDataText = f'Plotting preprocessed spectra ...'
+            self.preprocessedSpectralPlot(self.preprocessedData)
             self.Dataloaded = True
-        
-        self.dataLoadingScreen()
+            
+            
+        self.Dataloaded = False
         threading.Thread(target = preprocessing_in_thread).start()
+        self.dataLoadingScreen()
+        
+    def savePreprocessedData(self):
+        self.Dataloaded = False
+        
+        self.saveFile = tk.filedialog.asksaveasfile(defaultextension = '.csv',
+                                               filetypes = [("Comma Separated Values", "*.csv"),
+                                                            ("Text File", ".txt"),
+                                                            ("Numpy Array", "*.npy"),
+                                                            ])
+        if self.saveFile is not None:
+            self.loadDataText = f'Saving preprocessed data ...'
+            threading.Thread(target = self.setDataloader).start()
+            self.dataLoadingScreen()
+            self.saveFile.close()
+            
+    def setDataloader(self):
+        dataToSave = self.preprocessedData
+        saveDatatoComputer(dataToSave, self.saveFile.name)
+        self.Dataloaded = True
+
 
     def rawSpectralPlot(self, spectral_array):
         
-        indices = np.random.choice(spectral_array.shape[0], size=50, replace=False)
+        indices = np.random.choice(spectral_array.shape[0], size=1000, replace=False)
         selected_rows = spectral_array[indices]
         self.rawPlotFigax.clear()
         for i, row in enumerate(selected_rows):
@@ -827,7 +836,7 @@ class App(ctk.CTk):
         
     def preprocessedSpectralPlot(self, spectral_array):
         
-        indices = np.random.choice(spectral_array.shape[0], size=50, replace=False)
+        indices = np.random.choice(spectral_array.shape[0], size=1000, replace=False)
         selected_rows = spectral_array[indices]
         self.preProcessedPlotFigax.clear()
         for i, row in enumerate(selected_rows):
@@ -893,7 +902,7 @@ class App(ctk.CTk):
         self.ppModelLabel.grid(row = 0, column = 0,padx=100, pady=(100,5), sticky = 'ew')
         self.ppModelOptions = ctk.CTkOptionMenu(master = self.PreprocessingForm,
                                                 values = ["Standard Normal Variate", 
-                                                          "Multiplicative Scatter Correction", 
+                                                          
                                                           "Savitzky-Golay", 
                                                           "Normalization"],command = self.preferenceOptions_callback)
         self.ppModelOptions.set("Preprocessing Models")

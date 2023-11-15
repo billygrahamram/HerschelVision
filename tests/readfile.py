@@ -1,5 +1,6 @@
 from plantcv import plantcv as pcv
 import numpy as np
+import pandas as pd
 from sklearn.cluster import KMeans
 from scipy.signal import savgol_filter
 from sklearn.preprocessing import MinMaxScaler
@@ -57,37 +58,33 @@ def unfold(data):
 
 def preprocessing(selection, data):
     
-    
+    print(data.shape)
     if selection == "Standard Normal Variate":
         snvData = snv(data)
         return snvData
         
-    elif selection == "Multiplicative Scatter Correction":
-        mscData = msc (data)
-        return mscData
-        
     elif selection == "Savitzky-Golay (first)":
-        w = 5
-        p = 1
-        sgoneData= savgol_filter(data, w, polyorder = p, deriv=0)
+        w = 13
+        p = 2
+        sgoneData= savgol_filter(data, w, polyorder = p, deriv=1)
         return sgoneData
        
     elif selection == "Savitzky-Golay (second)":
-        w = 5
-        p = 1
+        w = 13
+        p = 2
         sgtwoData = savgol_filter(data, w, polyorder = p, deriv=2)
         return sgtwoData
         
     elif selection == "Normalization":
-        X_one_column = data.reshape([-1,1])
-        scaler = MinMaxScaler()
-        result_one_column = scaler.fit_transform(X_one_column)
-        result = result_one_column.reshape(data.shape)
-        return result
+        normalizedData = normalize(data)
+        return normalizedData
     elif selection == "None (pass)":
         return data
     
-    
+
+def normalize(data):
+    scaler = MinMaxScaler()
+    return scaler.fit_transform(data)
     
 def snv(input_data):
     # """
@@ -99,9 +96,6 @@ def snv(input_data):
         
     #     :returns: data_snv (ndarray): Scatter corrected spectra
     # """
-
-    input_data = np.asarray(input_data)
-    
     # Define a new array and populate it with the corrected data  
     data_snv = np.zeros_like(input_data)
     for i in range(data_snv.shape[0]):
@@ -118,24 +112,34 @@ def msc(input_data, reference=None):
         :type input_data: DataFrame
         :returns: data_msc (ndarray): Scatter corrected spectra data
     """
-    eps = np.finfo(np.float32).eps
+    # Convert input data to a numpy array
     input_data = np.array(input_data, dtype=np.float64)
-    ref = []
-    sampleCount = int(len(input_data))
 
-    # mean centre correction
-    for i in range(input_data.shape[0]):
-        input_data[i,:] -= input_data[i,:].mean()
-    
-    # Get the reference spectrum. If not given, estimate it from the mean
+    # Mean center correction
+    input_data -= np.mean(input_data, axis=0)
+
+    # Get the reference spectrum. If not given, estimate it from the mean    
+    if reference is None:
+        reference = np.mean(input_data, axis=0)
+
     # Define a new array and populate it with the corrected data    
     data_msc = np.zeros_like(input_data)
     for i in range(input_data.shape[0]):
-        for j in range(0, sampleCount, 10):
-            ref.append(np.mean(input_data[j:j+10], axis=0))
-            # Run regression
-            fit = np.polyfit(ref[i], input_data[i,:], 1, full=True)
-            # Apply correction
-            data_msc[i,:] = (input_data[i,:] - fit[0][1]) / fit[0][0]
-    
-    return (data_msc)
+        # Fit a linear model (y = mx + b) to the data
+        m, b = np.polyfit(reference, input_data[i,:], 1)
+        # Apply correction
+        data_msc[i,:] = (input_data[i,:] - b) / m
+
+    return data_msc
+
+def saveDatatoComputer(numpyarray, filename):
+    df = pd.DataFrame(numpyarray)
+    if filename.endswith('.csv'):
+        df.to_csv(filename, index=False)
+    elif filename.endswith('.npy'):
+        df.to_numpy().dump(filename)
+    elif filename.endswith('.txt'):
+        df.to_csv(filename, sep='\t', index=False)
+
+
+
