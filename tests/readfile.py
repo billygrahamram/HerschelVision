@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from scipy.signal import savgol_filter
 from sklearn.preprocessing import MinMaxScaler
+from PIL import Image, ImageTk
 
 def readData(raw_img_dir):
     # reads the data and returns a 3 D numpy array
@@ -132,14 +133,56 @@ def msc(input_data, reference=None):
 
     return data_msc
 
+# def saveDatatoComputer(numpyarray, filename):
+#     df = pd.DataFrame(numpyarray)
+#     if filename.endswith('.csv'):
+#         df.to_csv(filename, index=False)
+#     elif filename.endswith('.npy'):
+#         df.to_numpy().dump(filename)
+#     elif filename.endswith('.txt'):
+#         df.to_csv(filename, sep='\t', index=False)
+        
+
+
 def saveDatatoComputer(numpyarray, filename):
-    df = pd.DataFrame(numpyarray)
     if filename.endswith('.csv'):
+        # Flatten the array and save it as a CSV
+        flat_array = numpyarray.flatten()
+        df = pd.DataFrame(flat_array)
         df.to_csv(filename, index=False)
     elif filename.endswith('.npy'):
-        df.to_numpy().dump(filename)
+        # Save the 3D array as a .npy file
+        np.save(filename, numpyarray)
     elif filename.endswith('.txt'):
+        # Flatten the array and save it as a txt
+        flat_array = numpyarray.flatten()
+        df = pd.DataFrame(flat_array)
         df.to_csv(filename, sep='\t', index=False)
 
 
 
+        
+def tkImage(path):
+    image = Image.open(path)
+    tk_image = ImageTk.PhotoImage(image)
+    return tk_image
+
+
+
+def crop_3d_image(image, top_left, bottom_right):
+    """
+    Crop a 3D numpy image using the coordinates of the top left and bottom right corners.
+
+    Parameters:
+    image (numpy.ndarray): The 3D image to crop.
+    top_left (tuple): The (x, y) coordinates of the top left corner.
+    bottom_right (tuple): The (x, y) coordinates of the bottom right corner.
+
+    Returns:
+    numpy.ndarray: The cropped 3D image.
+    """
+    x1, y1 = top_left
+    x2, y2 = bottom_right
+    z1, z2 = 0, image.shape[2]  # Take the entire range along the z-axis
+    croppedCube = image[y1:y2, x1:x2, z1:z2]
+    return croppedCube

@@ -23,6 +23,7 @@ from readfile import *
 
 from plantcv import plantcv as pcv
 import numpy as np
+import cv2
 
 
 ctk.set_appearance_mode("light") # light, dark, system
@@ -85,10 +86,6 @@ def button_event():
     print("button pressed")
     
 
-
-
-
-
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -105,11 +102,8 @@ class App(ctk.CTk):
     
         ## self.raw_img_dir is the directory path for the image currently worked on.
         self.raw_img_dir = None
+        self.Dataloaded = False
   
-
-
-
-        
         # Empty the img_dir_record.txt file at startup. Opens and closes it, making the file empty.
         data_path_file = os.path.join('history', 'img_dir_record.txt')
         with open(data_path_file, 'w') as f:
@@ -165,6 +159,8 @@ class App(ctk.CTk):
             self.preferencesWindow()
         elif choice == 'Home':
             self.homeWindow()
+        elif choice == 'Cropping':
+            self.croppingWindow()
 
     
     def homeWindow(self):
@@ -226,8 +222,7 @@ class App(ctk.CTk):
                 homeCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas=homeCanvas))
                 homeCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = homeCanvas, image = self.tk_image))
 
-            
-        # right side plot and labels
+        
         #### wavelength plot ######
         self.wavelengthPlotFig, self.wavelengthPlotFigax = plt.subplots()
         self.wavelengthPlotFig.set_facecolor(self.rgbValues())
@@ -243,15 +238,12 @@ class App(ctk.CTk):
         self.scatterPlotFig.set_facecolor(self.rgbValues())
         self.scatterPlotFigax.set_facecolor(self.rgbValues())
         self.scatterPlotFigax.set_title("Scatter Plot")
-
         self.scatterPlotFigax.set_xlabel("Band 1")
         self.scatterPlotFigax.set_ylabel("Band 2")
         self.scatterPlotFigCanvas = FigureCanvasTkAgg(self.scatterPlotFig, master= self.rightPlotsImgFrame)
         self.scatterPlotFigCanvas.get_tk_widget().grid(row= 1, column=0,  sticky='nsew')
 
-
-
-
+        # wavelength slider
         self.wavelengthSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
         self.wavelengthSliderCurrentValueLabel.grid(row = 0, column =0, columnspan =2, padx = (100,5))
         self.wavelengthSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
@@ -259,25 +251,23 @@ class App(ctk.CTk):
         self.wavelengthSlider.grid(row = 1, column = 0, columnspan=2, padx = (100,5))
         self.wavelengthsSlider_event(112)
         
-
-        
+        # band 1 slider
         self.band1ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
         self.band1ScatterSliderCurrentValueLabel.grid(row = 0, column =2, padx = (100,5))
-        # right scatter slider and slider label for first band
         self.band1ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
                                 height = 20, command = self.band1ScatterSlider_event)
         self.band1ScatterSlider.grid(row =1, column =2, padx = (100,5))
         self.band1ScatterSlider_event(112)
         
-        
+        # band 2 slider
         self.band2ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
         self.band2ScatterSliderCurrentValueLabel.grid(row = 0, column =3, padx = (5,100))
-        # right scatter slider and slider label for second band
         self.band2ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
                                 height = 20, command = self.band2ScatterSlider_event)
         self.band2ScatterSlider.grid(row =1, column=3, padx=(5,100))
         self.band2ScatterSlider_event(112)
         
+        # set default values
         self.band1Value = 150
         self.band2Value = 150
         
@@ -290,10 +280,10 @@ class App(ctk.CTk):
         canvas_ratio = event.width / event.height
         img_ratio = tk_image.size[0]/tk_image.size[1]
         
-        if canvas_ratio > img_ratio: # canvas is wider than the image
+        if canvas_ratio > img_ratio: 
             height = int(event.height)
             width = int(height * img_ratio)
-        else: # canvas is narrow than the image
+        else: 
             width = int(event.width)
             height = int(width/img_ratio)
             
@@ -356,7 +346,7 @@ class App(ctk.CTk):
         
         self.Dataloaded = False
         #using multithreading to show the loading dialog box while data is loading
-        self.process_thread = threading.Thread(target = self.loadData).start()
+        threading.Thread(target = self.loadData).start()
         
         self.dataLoadingScreen()  
         
@@ -372,21 +362,14 @@ class App(ctk.CTk):
         self.Dataloaded = True
         
     def dataLoadingScreen(self):
-   
-            
-         # creates a new top level tkinter window.
         loading_window = tk.Toplevel(self)
         loading_window.transient(self) 
         loading_window.title("Loading data")
         loading_window.geometry("500x200")
         loading_window.resizable(width=False, height=False)
 
-        # routes all event for the app to loading window.
-        # user cannot intereact with app until loading window is closed.
         loading_window.grab_set()
-        
-        # makes the popup window appear on top of the application window
-        # instead of a seperate desktop window.
+
         loading_window.attributes('-topmost', True)
         loading_window.after_idle(loading_window.attributes, '-topmost', False)
         
@@ -397,7 +380,6 @@ class App(ctk.CTk):
         progress = ctk.CTkProgressBar(loading_window, width = 150, height = 30, mode='indeterminate', orientation='horizontal')
         progress.pack(side = 'top',expand=True, fill='x', padx = 80, pady=(0,80))
         progress.start()
-
         
         def check_data_loaded():
             if self.Dataloaded:
@@ -433,11 +415,7 @@ class App(ctk.CTk):
                             relief='ridge')
         
             
-            openCanvas.pack(expand =True, fill='both')
-            
-            # # makes sure that the new image is displayed as "fit" within the frame.
-            # openCanvas.pack(side = 'top', expand=True, fill='both')
-        
+            openCanvas.pack(expand =True, fill='both')        
             openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
             openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image))
             # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
@@ -636,9 +614,160 @@ class App(ctk.CTk):
         elif choice == "ViT-B SAM Model":
             print("vit b sam model pressed")
 
-      
-
     
+    
+    def croppingWindow(self):
+        
+        def callback(event):
+            # print ("clicked at", event.x, event.y)
+            
+            xypos.append([event.x, event.y])
+            if len(xypos) > 1:
+                oriImgcroppingCanvas.delete("box")  # delete the old rectangle
+                x, y = xypos[0]
+                x1, y1 = xypos[-1]
+                oriImgcroppingCanvas.create_rectangle(x, y, event.x, event.y, outline="red", tags="box", width=2)
+            
+        
+        def getCroppedimage(canvas, image, xypos):
+
+            x, y = xypos[0]
+            x1, y1 = xypos[-1]
+            
+            border_x = (canvas.winfo_width() - self.resized_tk.width()) / 2
+            border_y = (canvas.winfo_height() - self.resized_tk.height()) / 2
+
+            imgX = x-int(border_x)
+            imgY = y-int(border_y)
+            imgX1 = x1-int(border_x)
+            imgY1 = y1-int(border_y)
+            
+            x_scale_ratio = image.width / self.resized_tk.width()
+            y_scale_ratio = image.height / self.resized_tk.height()
+            
+            self.scaled_imgX = round(imgX * x_scale_ratio)
+            self.scaled_imgY = round(imgY * y_scale_ratio)
+            self.scaled_imgX1 = round(imgX1 * x_scale_ratio)
+            self.scaled_imgY1 = round(imgY1 * y_scale_ratio)
+            
+            croppedImage = image.crop((self.scaled_imgX, self.scaled_imgY, self.scaled_imgX1, self.scaled_imgY1))
+            
+            return croppedImage
+
+        def display_cropped_image(event):
+            # Crop the image
+            self.cropped_image = getCroppedimage(oriImgcroppingCanvas, self.tk_image, xypos)
+            
+            xypos.clear()
+            
+            # Convert the cropped image to a PhotoImage
+           
+            for widget in self.rightCroppedImageFrame.winfo_children():
+                widget.destroy()
+            croppedImgcroppingCanvas = ctk.CTkCanvas(self.rightCroppedImageFrame,
+                bg = self.rgbValues(),
+                bd =0,
+                highlightthickness=0,
+                relief='ridge')
+            
+            croppedImgcroppingCanvas.pack(expand = True, fill='both', side ='top')
+            croppedImgcroppingCanvas.image = ImageTk.PhotoImage(self.cropped_image)
+            
+            croppedImgcroppingCanvas.update()
+                # Get the canvas size
+            canvas_width = croppedImgcroppingCanvas.winfo_width()
+            canvas_height = croppedImgcroppingCanvas.winfo_height()
+
+            
+            center_x = int(canvas_width /2)
+            center_y = int(canvas_height / 2)
+            
+            # Add the image to the canvas
+            croppedImgcroppingCanvas.create_image( center_x,center_y,
+                                                  anchor = 'center',
+                                                  image=croppedImgcroppingCanvas.image)
+
+
+        
+        
+        
+        
+        
+        def savecroppedImage():
+            self.Dataloaded = False
+            
+            self.saveFile = tk.filedialog.asksaveasfile(defaultextension = '.npy',
+                                                filetypes = [("Comma Separated Values", "*.csv"),
+                                                                ("Text File", ".txt"),
+                                                                ("Numpy Array", "*.npy"),
+                                                                ])
+            if self.saveFile is not None:
+                self.loadDataText = f'Saving cropped data ...'
+                threading.Thread(target = setDataloader).start()
+                self.dataLoadingScreen()
+                self.saveFile.close()
+            
+        def setDataloader():
+            dataToSave = crop_3d_image(self.spectral_array,(self.scaled_imgX, self.scaled_imgY), (self.scaled_imgX1, self.scaled_imgY1))
+            saveDatatoComputer(dataToSave, self.saveFile.name)
+            self.Dataloaded = True
+        
+        
+        
+        
+        
+        
+        
+        
+
+        # Clear self.workAreaFrame
+        for widget in self.workAreaFrame.winfo_children():
+            widget.destroy()
+
+        
+        ## children to workMenuFrame 
+        self.leftOriginalImageFrame = ctk.CTkFrame(master = self.workAreaFrame)
+        self.leftOriginalImageFrame.place(x = 0, y = 0, relwidth = 0.5, relheight = 0.9)
+
+        self.rightCroppedImageFrame = ctk.CTkFrame(master = self.workAreaFrame)
+        self.rightCroppedImageFrame.place(relx = 0.5, y = 0, relwidth = 0.5, relheight = 0.9)
+        
+        self.leftBottomButtonCroppingFrame = ctk.CTkFrame(master = self.workAreaFrame)
+        self.leftBottomButtonCroppingFrame.place(rely = 0.9, x=0, relwidth = 0.5, relheight = 0.1)
+    
+        self.righBottomButtonCroppingFrame = ctk.CTkFrame(master = self.workAreaFrame)
+        self.righBottomButtonCroppingFrame.place(rely = 0.9, relx=0.5, relwidth = 0.5, relheight = 0.1)
+        self.righBottomButtonCroppingFrame.columnconfigure((0,1,2), weight = 1)
+        
+        self.saveCroppedImageButton = ctk.CTkButton(master = self.righBottomButtonCroppingFrame, 
+                                                    text = 'Save Cropped Image',
+                                                    command= savecroppedImage)
+        self.saveCroppedImageButton.grid(row =0, column =1, sticky = 'nsew', pady= 30)
+      
+   
+        if self.raw_img_dir == None:
+            pass
+        else:
+            for widget in self.leftOriginalImageFrame.winfo_children():
+                widget.destroy()
+            xypos = []
+            
+            oriImgcroppingCanvas = ctk.CTkCanvas(self.leftOriginalImageFrame,
+                            bg = self.rgbValues(),
+                            bd =0,
+                            highlightthickness=0,
+                            relief='ridge')
+        
+            
+            oriImgcroppingCanvas.pack(expand =True, fill='both')
+            oriImgcroppingCanvas.bind('<Configure>',lambda event: self.full_image(event, tk_image= self.tk_image, canvas=oriImgcroppingCanvas))
+            oriImgcroppingCanvas.bind("<B1-Motion>", callback)
+            oriImgcroppingCanvas.bind("<ButtonRelease-1>", display_cropped_image)
+
+
+                
+
+ 
             
             
             
@@ -659,7 +788,7 @@ class App(ctk.CTk):
         self.rightPreProFrame.place(relx = 0.6, y = 0, relwidth = 0.4, relheight = 1)
     
 
-        self.leftButtonsPreProFrame.rowconfigure((0,1,2,3,4,5,6,7), weight = 1)
+        self.leftButtonsPreProFrame.rowconfigure((0,1,2,3,4,5,6,7,8,9), weight = 1)
         # self.rightPreProFrame.rowconfigure((0,1,2,3,4,5,6,7), weight = 1)
         # self.rightPreProFrame.columnconfigure((0,1), weight = 1)
         
@@ -669,19 +798,23 @@ class App(ctk.CTk):
         ## label and dropdown for the preprocessing methods
         
         self.PreProOptionsInput = ctk.CTkLabel(master = self.leftButtonsPreProFrame,
-                                               text = "Input: Raw Data")
-        self.PreProOptionsInput.grid(row = 0, column = 0, sticky='ew', padx = 30, pady =(100,5))
+                                               text = "Input: Raw Data. \nSelect filters as forward feed. \nSelect None (pass) to skip filter.")
+        self.PreProOptionsInput.grid(row = 0, column = 0, sticky='ew', padx = 30, pady =(50,0))
+        
+        self.preProOptionsArrow = ctk.CTkLabel(master = self.leftButtonsPreProFrame,
+                                               image=tkImage('data/downarrow.png'),
+                                               text = '')
+        self.preProOptionsArrow.grid(row = 1, column = 0, sticky='s', pady=(0,0))
 
         self.PreProOptions1 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
                                                 values = ["Standard Normal Variate", 
-                                                          
                                                           "Savitzky-Golay (first)",
                                                           "Savitzky-Golay (second)",
                                                           "Normalization"],
                                                 command = lambda selection: self.preProcessingPipeLineSelection("option1", selection))
         
         self.PreProOptions1.set("Filter 1")
-        self.PreProOptions1.grid(row = 1, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        self.PreProOptions1.grid(row = 2, column = 0, sticky='ew', padx = 30, pady =(0,5))
    
         
         self.PreProOptions2 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
@@ -693,7 +826,7 @@ class App(ctk.CTk):
                                                           "None (pass)"],
                                                 command = lambda selection: self.preProcessingPipeLineSelection("option2", selection))
         self.PreProOptions2.set("Filter 2")
-        self.PreProOptions2.grid(row = 2, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        self.PreProOptions2.grid(row = 3, column = 0, sticky='ew', padx = 30, pady =(0,5))
         
         self.PreProOptions3 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
                                                 values = ["Standard Normal Variate", 
@@ -704,44 +837,41 @@ class App(ctk.CTk):
                                                           "None (pass)"],
                                                 command = lambda selection: self.preProcessingPipeLineSelection("option3", selection))
         self.PreProOptions3.set("Filter 3")
-        self.PreProOptions3.grid(row = 3, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        self.PreProOptions3.grid(row = 4, column = 0, sticky='ew', padx = 30, pady =(0,5))
         
         self.PreProOptions4 = ctk.CTkOptionMenu(master = self.leftButtonsPreProFrame,
                                                 values = ["Standard Normal Variate", 
-                                                         
                                                           "Savitzky-Golay (first)",
                                                           "Savitzky-Golay (second)",
                                                           "Normalization",
                                                           "None (pass)"],
                                                 command = lambda selection: self.preProcessingPipeLineSelection("option4", selection))
         self.PreProOptions4.set("Filter 4")
-        self.PreProOptions4.grid(row = 4, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        self.PreProOptions4.grid(row = 5, column = 0, sticky='ew', padx = 30, pady =(0,0))
+        
+        self.preProOptionsArrow = ctk.CTkLabel(master = self.leftButtonsPreProFrame,
+                                               image=tkImage('data/downarrow.png'),
+                                               text = '')
+        self.preProOptionsArrow.grid(row = 6, column = 0, sticky='n', pady=(0,0))
         
 
-        
     
-        
         self.PreProOptionsOutput = ctk.CTkLabel(master = self.leftButtonsPreProFrame,
                                                text = "Output: Preprocessed Data")
-        self.PreProOptionsOutput.grid(row = 5, column = 0, sticky='ew', padx = 30, pady =(0,5))
+        self.PreProOptionsOutput.grid(row = 7, column = 0, sticky='ew', padx = 30, pady =(0,5))
         
         self.PreProApplyButton = ctk.CTkButton(master=self.leftButtonsPreProFrame, 
                                                     text="Apply Preprocessing", 
                                                     command = self.applyPreprocessing)
-        self.PreProApplyButton.grid(row = 6, column = 0, sticky='ew', padx = 30, pady = (0,5))
+        self.PreProApplyButton.grid(row = 8, column = 0, sticky='ew', padx = 30, pady = (0,5))
         
         self.PreProSaveButton = ctk.CTkButton(master=self.leftButtonsPreProFrame, 
                                                     text="Save Preprocessed Data", 
                                                     command = self.savePreprocessedData)
-        self.PreProSaveButton.grid(row = 7, column = 0, sticky='ew', padx = 30, pady = (0,100))
+        self.PreProSaveButton.grid(row = 9, column = 0, sticky='ew', padx = 30, pady = (0,50))
         
-        
-        
-        
-        
-        
-        
-        
+
+        # raw spectral plot in preprocessing window
         self.rawPlotFig, self.rawPlotFigax = plt.subplots(figsize =(10,10), dpi =40)
         self.rawPlotFig.set_facecolor(self.rgbValues())
         self.rawPlotFigax.set_facecolor(self.rgbValues())
@@ -751,7 +881,7 @@ class App(ctk.CTk):
         self.rawPlotFigCanvas = FigureCanvasTkAgg(self.rawPlotFig, master= self.middlePreProFrame)
         self.rawPlotFigCanvas.get_tk_widget().pack(expand = True, fill ='x')
         
-        
+        # preprocessed spectral plot in preprocessing window
         self.preProcessedPlotFig, self.preProcessedPlotFigax = plt.subplots(figsize =(10,10), dpi = 40)
         self.preProcessedPlotFig.set_facecolor(self.rgbValues())
         self.preProcessedPlotFigax.set_facecolor(self.rgbValues())
@@ -766,7 +896,6 @@ class App(ctk.CTk):
         else:
             self.rawSpectralPlot(self.unfoldedData)
         
-    
     def preProcessingPipeLineSelection(self, source, selection):
         print(f"Selection from {source}: {selection}")
         if source == "option1":
@@ -820,7 +949,6 @@ class App(ctk.CTk):
         dataToSave = self.preprocessedData
         saveDatatoComputer(dataToSave, self.saveFile.name)
         self.Dataloaded = True
-
 
     def rawSpectralPlot(self, spectral_array):
         
@@ -1020,16 +1148,17 @@ class App(ctk.CTk):
         self.SpectralResolutionEntry = ctk.CTkEntry(master = self.EMRInfoFrame, placeholder_text="Spectral Resolution" )
         self.SpectralResolutionEntry.grid(row = 3, column = 1,padx=100, pady=5,sticky = 'ew')
 
-    def dimensionPercentage(self, percent, dimension='w'):
-        if dimension == 'h':
-            size = self.winfo_height()
-        elif dimension == 'w':
-            size = self.winfo_width()
-        else:
-            raise ValueError("Invalid dimension: choose either 'w' or 'h'")
+    # def dimensionPercentage(self, percent, dimension='w'):
+    #     if dimension == 'h':
+    #         size = self.winfo_height()
+    #     elif dimension == 'w':
+    #         size = self.winfo_width()
+    #     else:
+    #         raise ValueError("Invalid dimension: choose either 'w' or 'h'")
             
-        pxSize = int((percent*size)/100)
-        return pxSize
+    #     pxSize = int((percent*size)/100)
+    #     return pxSize
+    # CAN BE DELETED LATER. SAVING ONLY FOR DEGUGGING
 
     def saveImgasNPYButton(self, master):
         self.button = ctk.CTkButton(master=master,
@@ -1055,9 +1184,6 @@ class App(ctk.CTk):
                                                     border_color='gray',
                                                     command=button_event)
         self.button.grid(row = 7, column = 1, sticky='ew')
-        
-    
-        
         
         
     def rgbValues(self):
