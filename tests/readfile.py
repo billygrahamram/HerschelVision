@@ -5,6 +5,8 @@ from sklearn.cluster import KMeans
 from scipy.signal import savgol_filter
 from sklearn.preprocessing import MinMaxScaler
 from PIL import Image, ImageTk
+import cv2
+
 
 def readData(raw_img_dir):
     # reads the data and returns a 3 D numpy array
@@ -44,7 +46,8 @@ def single_band(arr, band):
     # Normalize the bands to the range [0, 255]
     band = (arr[:,:,band] - np.min(arr[:,:,band])) / (np.max(arr[:,:,band]) - np.min(arr[:,:,band])) * 255
     
-    return band.astype(np.uint8)
+    image = band.astype(np.uint8)
+    return image
 
 def unfold(data):
     x,y,z = data.shape
@@ -57,7 +60,7 @@ def unfold(data):
     return unfolded
 
 
-def preprocessing(selection, data):
+def preprocessing(selection, data, w, p):
     
     print(data.shape)
     if selection == "Standard Normal Variate":
@@ -65,15 +68,13 @@ def preprocessing(selection, data):
         return snvData
         
     elif selection == "Savitzky-Golay (first)":
-        w = 13
-        p = 2
-        sgoneData= savgol_filter(data, w, polyorder = p, deriv=1)
+ 
+        sgoneData= savgol_filter(data, window_length=w, polyorder = p, deriv=1)
         return sgoneData
        
     elif selection == "Savitzky-Golay (second)":
-        w = 13
-        p = 2
-        sgtwoData = savgol_filter(data, w, polyorder = p, deriv=2)
+   
+        sgtwoData = savgol_filter(data, window_length=w, polyorder = p, deriv=2)
         return sgtwoData
         
     elif selection == "Normalization":
@@ -88,16 +89,7 @@ def normalize(data):
     return scaler.fit_transform(data)
     
 def snv(input_data):
-    # """
-    #     :snv: A correction technique which is done on each
-    #     individual spectrum, a reference spectrum is not
-    #     required
-    #     :param input_data: Array of spectral data
-    #     :type input_data: DataFrame
-        
-    #     :returns: data_snv (ndarray): Scatter corrected spectra
-    # """
-    # Define a new array and populate it with the corrected data  
+
     data_snv = np.zeros_like(input_data)
     for i in range(data_snv.shape[0]):
         # Apply correction
@@ -162,10 +154,10 @@ def saveDatatoComputer(numpyarray, filename):
 
 
         
-def tkImage(path):
-    image = Image.open(path)
-    tk_image = ImageTk.PhotoImage(image)
-    return tk_image
+# def tkImage(path):
+#     image = Image.open(path)
+#     tk_image = ImageTk.PhotoImage(image)
+#     return tk_image
 
 
 
@@ -186,3 +178,19 @@ def crop_3d_image(image, top_left, bottom_right):
     z1, z2 = 0, image.shape[2]  # Take the entire range along the z-axis
     croppedCube = image[y1:y2, x1:x2, z1:z2]
     return croppedCube
+
+
+def kmeansSegmentation(array, clusters, bands):
+    print(array.shape)
+    overlookBand = int(160)
+    array = array[:, :, overlookBand:(overlookBand + bands)]
+    X = array.reshape(-1, bands)
+    kmeans = KMeans(n_clusters=clusters, n_init=10)
+    kmeans.fit(X)
+    segmented_img = kmeans.cluster_centers_[kmeans.labels_]
+    segmented_img = segmented_img.reshape(array.shape)
+    print (segmented_img.shape)
+    return segmented_img
+    
+    
+    
