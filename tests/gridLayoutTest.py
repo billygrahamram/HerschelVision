@@ -1342,46 +1342,7 @@ class App(ctk.CTk):
 
         
         
-        
-        
 
-
-    # def dimensionPercentage(self, percent, dimension='w'):
-    #     if dimension == 'h':
-    #         size = self.winfo_height()
-    #     elif dimension == 'w':
-    #         size = self.winfo_width()
-    #     else:
-    #         raise ValueError("Invalid dimension: choose either 'w' or 'h'")
-            
-    #     pxSize = int((percent*size)/100)
-    #     return pxSize
-    # CAN BE DELETED LATER. SAVING ONLY FOR DEGUGGING
-
-    def saveImgasNPYButton(self, master):
-        self.button = ctk.CTkButton(master=master,
-                                                    text='Save Image as NPY (3D array)',
-                                                    
-                                                    
-                                                    hover = True,
-                                                    
-                                                    border_width=1,
-                                                    border_color='gray',
-                                                    command=button_event)
-
-        self.button.grid(row = 7, column = 0, sticky='ew')
-        
-    def saveUnfoldDatButton(self, master):
-        self.button = ctk.CTkButton(master=master,
-                                                    text='Save Unfold Image (.txt)',
-                                                    
-                                                    
-                                                    hover = True,
-                                                    
-                                                    border_width=1,
-                                                    border_color='gray',
-                                                    command=button_event)
-        self.button.grid(row = 7, column = 1, sticky='ew')
         
         
     def rgbValues(self):
