@@ -1,5 +1,5 @@
-/Users/billygrahamram/Downloads/FX10_Ragweed_S_2022-08-24_17-54-29/capture/FX10_Ragweed_S_2022-08-24_17-54-29.raw
-
-/Users/billygrahamram/Downloads/FX17_Fire_Susceptible_14_2022-09-07_16-00-25/capture/FX17_Fire_Susceptible_14_2022-09-07_16-00-25.raw
-/Users/billygrahamram/Downloads/FX17_Fire_Susceptible_14_2022-09-07_16-00-25/capture/WHITEREF_FX17_Fire_Susceptible_14_2022-09-07_16-00-25.raw
-/Users/billygrahamram/Downloads/FX17_Fire_Susceptible_14_2022-09-07_16-00-25.raw
+/Volumes/Billy Data/Data/Billy HSI Data 2022/greenhouseOutput/fx10_crops/sugerbeet/sugarbeet/FX10_Day5_Sugarbeet_21_1_withBG.npy
+/Volumes/Billy Data/Data/Billy HSI Data 2022/greenhouseOutput/fx10_crops/sugerbeet/sugarbeet/FX10_Day4_Sugarbeet_6_4_withBG.npy
+/Volumes/Billy Data/Data/Billy HSI Data 2022/greenhouseOutput/fx10_crops/sugerbeet/sugarbeet/FX10_Day1_Sugarbeet_8_4_withBG.npy
+/Volumes/Billy Data/Data/Billy HSI Data 2022/greenhouseOutput/fx10_crops/flax/flax/Flax_D1_15_6_withBG.npy
+/Volumes/Billy Data/Data/Billy HSI Data 2022/greenhouseOutput/fx10_crops/flax/flax/Flax_D1_7_11_withBG.npy

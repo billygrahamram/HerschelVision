@@ -1,1 +1,1 @@
-/Users/billygrahamram/Downloads/FX10_Ragweed_S_2022-08-24_17-54-29/capture/FX10_Ragweed_S_2022-08-24_17-54-29.raw
+/Volumes/Billy Data/Data/Billy HSI Data 2022/greenhouseOutput/fx10_crops/sugerbeet/sugarbeet/FX10_Day5_Sugarbeet_21_1_withBG.npy

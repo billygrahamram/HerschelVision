@@ -259,7 +259,8 @@ class App(ctk.CTk):
     def open(self):
         self.raw_img_dir = tk.filedialog.askopenfilename(initialdir="/", 
                                                 title="Select file",
-                                                filetypes = [("Raw Hyperspectral Image", "*.raw")
+                                                filetypes = [("Raw Hyperspectral Image", "*.raw"),
+                                                             ("Numpy Array", "*.npy")
                                                              ])
         
         # this makes sure that if the user selected an image and then
@@ -1337,13 +1338,7 @@ class App(ctk.CTk):
         RGBButton.pack(side= 'top',padx=50, pady=10)
         EMRButton.pack(side= 'top',padx=50, pady=10)
         
-        
-        
 
-        
-        
-
-        
         
     def rgbValues(self):
     
