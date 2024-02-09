@@ -16,6 +16,18 @@ import os
 #     return spectral_array_data
 
 
+def applybinning(raw_data, value):
+    if raw_data.shape[-1]!=224:
+        array = raw_data
+        newsize = array.shape[-1]//value
+        newshape = array.shape[:-1] + (newsize,value)
+        binned_data = np.mean(array.reshape(newshape),axis=-1)
+        return(binned_data)
+    else:
+        return(raw_data)
+    
+    
+
 def readData(raw_img_dir):
     # Get the file extension
     # this allows the user to use plantcv for .raw format images and np.load for npy images.
@@ -25,8 +37,11 @@ def readData(raw_img_dir):
     if file_extension == '.raw':
         # reads the data and returns a 3D numpy array
         spectral_array = pcv.readimage(raw_img_dir, mode='envi')
-        spectral_array_data = spectral_array.array_data
-        return spectral_array_data
+        # spectral_array_data = spectral_array.array_data
+        
+        # #this line currently insures that 
+        # spectral_array_data = applybinning(spectral_array_data,2)
+        return spectral_array
 
     elif file_extension == '.npy':
         # Load the .npy file

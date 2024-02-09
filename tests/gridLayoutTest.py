@@ -46,20 +46,24 @@ class App(ctk.CTk):
         # default values
         self.raw_img_dir = None
         self.Dataloaded = False
+        
         #savePreProSetting
         self.SGWinSizePrePro = 13
         self.SGPolyOrderPrePro = 2
+        
         #saveSegmentationSetting
         self.KclusterNoSegPrePro = 2
         self.KClusterThresPrePro = 2
         self.selectedSAMModel = 'ViT-B SAM Model'
         self.defaultSegmentationMethod = 'K means clustering'
+        
         #savePseudoRGBSetting
         self.RedbandNoPseudoRGB = 50
         self.greenBandNoPseudoRGB = 100
         self.blueBandNoPseudoRGB = 150
+        
         #saveEMRSetting
-        self.noOfBandsEMR = 224
+        self.noOfBandsEMR = 447
         self.firstBandEMR = 300
         self.lastBandEMR =  1000
         self.spectralResolution = 5
@@ -202,28 +206,25 @@ class App(ctk.CTk):
         self.scatterPlotFigCanvas.get_tk_widget().grid(row= 1, column=0,  sticky='nsew')
 
         # wavelength slider
-        self.wavelengthSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
-        self.wavelengthSliderCurrentValueLabel.grid(row = 0, column =0, columnspan =2, padx = (100,5))
-        self.wavelengthSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
-                                 height=20,command = self.wavelengthsSlider_event)
+        self.wavelengthSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text = "", justify ="center")
+        self.wavelengthSliderCurrentValueLabel.grid(row = 0, column = 0, columnspan = 2, padx = (100,5))
+        self.wavelengthSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR, height=20,command = self.wavelengthsSlider_event)
         self.wavelengthSlider.grid(row = 1, column = 0, columnspan=2, padx = (100,5))
-        self.wavelengthsSlider_event(112)
+        self.wavelengthsSlider_event(150)
         
         # band 1 slider
         self.band1ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
         self.band1ScatterSliderCurrentValueLabel.grid(row = 0, column =2, padx = (100,5))
-        self.band1ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
-                                height = 20, command = self.band1ScatterSlider_event)
+        self.band1ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR, height = 20, command = self.band1ScatterSlider_event)
         self.band1ScatterSlider.grid(row =1, column =2, padx = (100,5))
-        self.band1ScatterSlider_event(112)
+        self.band1ScatterSlider_event(150)
         
         # band 2 slider
         self.band2ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
         self.band2ScatterSliderCurrentValueLabel.grid(row = 0, column =3, padx = (5,100))
-        self.band2ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = 223,
-                                height = 20, command = self.band2ScatterSlider_event)
+        self.band2ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR, height = 20, command = self.band2ScatterSlider_event)
         self.band2ScatterSlider.grid(row =1, column=3, padx=(5,100))
-        self.band2ScatterSlider_event(112)
+        self.band2ScatterSlider_event(150)
         
         # set default values
         self.band1Value = 150
@@ -312,13 +313,25 @@ class App(ctk.CTk):
         
     def loadData(self):
         self.loadDataText = 'Opening files...'
-        self.spectral_array = readData(self.raw_img_dir)
+        print("No of bands in the EMR", self.noOfBandsEMR)
+        self.currentData = readData(self.raw_img_dir)
+        self.spectral_array = self.currentData.array_data
+
+        self.noOfBandsEMR = len(self.currentData.wavelength_dict.values())
+        
+        print("No of bands in the EMR", self.noOfBandsEMR)
+        print("Max values", self.currentData.max_value)
+        print("Max wavelength",self.currentData.max_wavelength)
+        print("Wavelength units",self.currentData.wavelength_units)
+        print("Wavelength dict.values",len(self.currentData.wavelength_dict.values()))
+        print("Lines",self.currentData.lines)
+        print("Default Bands",self.currentData.default_bands)
         self.loadDataText = 'Loading data and creating plots...'
         self.kmeanslabels, self.kmeansData = scatterPlotData(self.raw_img_dir)
         self.loadDataText = 'Unfolding data...'
         self.unfoldedData = unfold(self.spectral_array)
         self.loadDataText = 'Finishing up...'
-        self.wavelengthsSlider_event(value=112)
+        self.wavelengthsSlider_event(value = 115)
         self.Dataloaded = True
         
     def dataLoadingScreen(self):
@@ -356,8 +369,11 @@ class App(ctk.CTk):
         if self.raw_img_dir == None:
             pass
         else:
-            single_band_img = single_band(self.spectral_array, int(value))
+            print("noOfBandsEMR before slider creation and the type: ", self.noOfBandsEMR, type(self.noOfBandsEMR))
+            value = int(float(value))
+            print("Slider value: ", value)
             
+            single_band_img = single_band(self.spectral_array, int(value))
             self.tk_image = Image.fromarray(np.uint8(single_band_img))
 
             # updates the current slider value
@@ -370,9 +386,9 @@ class App(ctk.CTk):
             
             openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
                             bg = self.rgbValues(),
-                            bd =0,
-                            highlightthickness=0,
-                            relief='ridge')
+                            bd = 0,
+                            highlightthickness = 0,
+                            relief = 'ridge')
         
             
             openCanvas.pack(expand =True, fill='both')        
@@ -386,11 +402,11 @@ class App(ctk.CTk):
         if self.raw_img_dir == None:
             pass
         else:
-            self.band1ScatterSliderCurrentValueLabel.configure(text= "First Band: " + str(int(value)))
-            self.band1Value= int(value)
+            self.band1ScatterSliderCurrentValueLabel.configure(text = "First Band: " + str(int(value)))
+            self.band1Value = int(value)
             self.scatterPlotFigax.clear()
             self.scatterPlotFigax.scatter(self.kmeansData[:, self.band1Value], 
-                                          self.kmeansData[:,self.band2Value], 
+                                          self.kmeansData[:, self.band2Value], 
                                           c=self.kmeanslabels, s=10)
             self.scatterPlotFigax.set_title("Scatter Plot")
             self.scatterPlotFigax.set_xlabel("Band 1")
@@ -405,7 +421,7 @@ class App(ctk.CTk):
             self.band2Value = int(value)
             self.scatterPlotFigax.clear()
             self.scatterPlotFigax.scatter(self.kmeansData[:, self.band1Value], 
-                                          self.kmeansData[:,self.band2Value], 
+                                          self.kmeansData[:, self.band2Value], 
                                           c=self.kmeanslabels, s=10)
             self.scatterPlotFigax.set_title("Scatter Plot")
             self.scatterPlotFigax.set_xlabel("Band 1")
@@ -459,7 +475,7 @@ class App(ctk.CTk):
     def wavelengthPlot(self,scaled_imgX, scaled_imgY):
         reflectance = self.spectral_array[int(scaled_imgY), int(scaled_imgX), :]
         self.wavelengthPlotFigax.clear()
-        self.wavelengthPlotFigax.plot(np.arange(1, 225), reflectance)
+        self.wavelengthPlotFigax.plot(np.arange(0, self.noOfBandsEMR), reflectance)
         self.wavelengthPlotFigax.set_title("Wavelength Plot")
         self.wavelengthPlotFigax.set_xlabel("Wavelength")
         self.wavelengthPlotFigax.set_ylabel("Reflectance")
@@ -500,7 +516,6 @@ class App(ctk.CTk):
         aboutCanvas.create_image(0, 0, image=aboutImg_tk, anchor='nw')
         aboutCanvas.pack(expand=True, fill='both')
 
-            
     def preferenceOptions_callback(self, choice):
         if choice == "K-means clustering":
             print("k means pressed")
@@ -519,8 +534,6 @@ class App(ctk.CTk):
         elif choice == "ViT-B SAM Model":
             print("vit b sam model pressed")
 
-    
-    
     def croppingWindow(self):
         
         
@@ -897,13 +910,6 @@ class App(ctk.CTk):
             oriImgcroppingCanvas.bind("<B1-Motion>", callback)
             oriImgcroppingCanvas.bind("<ButtonRelease-1>", display_cropped_image)
 
-
-                
-
- 
-            
-            
-            
     def preprocessingWindow(self):
         
         # Clear self.workAreaFrame
@@ -1082,7 +1088,7 @@ class App(ctk.CTk):
         selected_rows = spectral_array[indices]
         self.rawPlotFigax.clear()
         for i, row in enumerate(selected_rows):
-            self.rawPlotFigax.plot(np.arange(1, 225), row, label=f'Row {indices[i]}')
+            self.rawPlotFigax.plot(np.arange(0, self.noOfBandsEMR), row, label=f'Row {indices[i]}')
         self.rawPlotFigax.set_title("Raw Spectral Signature")
         self.rawPlotFigax.set_xlabel("Wavelength")
         self.rawPlotFigax.set_ylabel("Reflectance")
@@ -1094,19 +1100,12 @@ class App(ctk.CTk):
         selected_rows = spectral_array[indices]
         self.preProcessedPlotFigax.clear()
         for i, row in enumerate(selected_rows):
-            self.preProcessedPlotFigax.plot(np.arange(1, 225), row, label=f'Row {indices[i]}')
+            self.preProcessedPlotFigax.plot(np.arange(0, self.noOfBandsEMR), row, label=f'Row {indices[i]}')
         self.preProcessedPlotFigax.set_title("Preprocessed Signature")
         self.preProcessedPlotFigax.set_xlabel("Wavelength")
         self.preProcessedPlotFigax.set_ylabel("Reflectance")
         self.preProcessedPlotFigCanvas.draw()
 
-
-        
-        
-        
-        
-        
-        
     def preferencesWindow(self): # the settings window that allows the user to input/select variables for analysis inputs.
         
         
@@ -1337,8 +1336,6 @@ class App(ctk.CTk):
         SegmentationButton.pack(side= 'top',padx=50, pady=10)
         RGBButton.pack(side= 'top',padx=50, pady=10)
         EMRButton.pack(side= 'top',padx=50, pady=10)
-        
-
         
     def rgbValues(self):
     
