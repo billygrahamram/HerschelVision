@@ -9,13 +9,6 @@ import cv2
 import os
 
 
-# def readData(raw_img_dir):
-#     # reads the data and returns a 3 D numpy array
-#     spectral_array = pcv.readimage(raw_img_dir, mode = 'envi')
-#     spectral_array_data = spectral_array.array_data
-#     return spectral_array_data
-
-
 def applybinning(raw_data, value):
     if raw_data.shape[-1]!=224:
         array = raw_data
@@ -37,10 +30,6 @@ def readData(raw_img_dir):
     if file_extension == '.raw':
         # reads the data and returns a 3D numpy array
         spectral_array = pcv.readimage(raw_img_dir, mode='envi')
-        # spectral_array_data = spectral_array.array_data
-        
-        # #this line currently insures that 
-        # spectral_array_data = applybinning(spectral_array_data,2)
         return spectral_array
 
     elif file_extension == '.npy':
@@ -53,20 +42,6 @@ def readData(raw_img_dir):
         return None
 
 
-# def scatterPlotData(raw_img_dir):
-#     # reads the data and returns a 3 D numpy array
-#     spectral_array = pcv.readimage(raw_img_dir, mode = 'envi')
-#     spectral_array_data = spectral_array.array_data 
-#     unfoldedData = unfold(spectral_array_data)
-#     unfoldedData = unfoldedData[:500,:]
-#     # Create a KMeans instance with 2 clusters (since you have two types of spectral signatures)
-#     kmeans = KMeans(n_clusters=2, random_state=0, n_init=10)
-#     # Fit the model to your data
-#     kmeans.fit(unfoldedData)
-#     # The labels_ attribute holds the cluster labels for each data point
-#     labels = kmeans.labels_
-
-#     return labels, unfoldedData
 
 def scatterPlotData(raw_img_dir):
     
@@ -107,9 +82,6 @@ def scatterPlotData(raw_img_dir):
     
     
 
-
-
-    
 def create_pseudo_rgb(arr, r_band, g_band, b_band):
     # Normalize the bands to the range [0, 255]
     r = (arr[:,:,r_band] - np.min(arr[:,:,r_band])) / (np.max(arr[:,:,r_band]) - np.min(arr[:,:,r_band])) * 255
@@ -118,7 +90,6 @@ def create_pseudo_rgb(arr, r_band, g_band, b_band):
     
     # Stack the bands along the last dimension
     rgb = np.dstack((r,g,b)).astype(np.uint8)
-    
     return rgb
 
 
@@ -129,24 +100,12 @@ def single_band(arr, band):
     image = band.astype(np.uint8)
     return image
 
-# def unfold(data):
-#     x,y,z = data.shape
-#     unfolded = data.reshape(x*y,z)
-#     for i in range(unfolded.shape[1]):
-#         col = unfolded[:,i]
-#         zero_indices = np.where(col == 0)[0]
-#         unfolded = np.delete(unfolded, zero_indices, axis=0)
-        
-#     return unfolded
-
 def unfold(data):
     x, y, z = data.shape
     unfolded = data.reshape(x*y, z)
     zero_rows = np.where(np.all(unfolded == 0, axis=1))
     unfolded = np.delete(unfolded, zero_rows, axis=0)
     return unfolded
-
-
 
 def preprocessing(selection, data, w, p):
     
@@ -213,16 +172,6 @@ def msc(input_data, reference=None):
 
     return data_msc
 
-# def saveDatatoComputer(numpyarray, filename):
-#     df = pd.DataFrame(numpyarray)
-#     if filename.endswith('.csv'):
-#         df.to_csv(filename, index=False)
-#     elif filename.endswith('.npy'):
-#         df.to_numpy().dump(filename)
-#     elif filename.endswith('.txt'):
-#         df.to_csv(filename, sep='\t', index=False)
-        
-
 
 def saveDatatoComputer(numpyarray, filename):
     if filename.endswith('.csv'):
@@ -238,15 +187,6 @@ def saveDatatoComputer(numpyarray, filename):
         # flat_array = numpyarray.flatten() # removed this line as it converts 2d array to 1d array
         df = pd.DataFrame(numpyarray)
         df.to_csv(filename, sep='\t', index=False)
-
-
-
-        
-# def tkImage(path):
-#     image = Image.open(path)
-#     tk_image = ImageTk.PhotoImage(image)
-#     return tk_image
-
 
 
 def crop_3d_image(image, top_left, bottom_right):
@@ -279,6 +219,3 @@ def kmeansSegmentation(array, clusters, bands):
     segmented_img = segmented_img.reshape(array.shape)
     print (segmented_img.shape)
     return segmented_img
-    
-    
-    

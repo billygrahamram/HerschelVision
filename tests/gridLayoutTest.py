@@ -6,6 +6,14 @@
 ## This code solely belongs to Billy G. Ram and is currently NOT open sourced. 
 #####################################################################################
 
+
+
+
+################ ISSUES THAT NEED TO BE FIXED ###################
+## 1. The wavelength and scatter sliders 1 and 2 do not update depending on the input data.
+## They only supports 224 bands data read in and if the input data is more than 224 the readfile.py will
+## apply binning to it, bringing it down to 224.
+
 import os
 import customtkinter as ctk
 import tkinter as tk
@@ -37,9 +45,9 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
     
+        self.title("Herchel Vision: Hyperspectral Image Analysis")
         self.geometry("1600x900")
         self.minsize(700,700)
-        self.title("Herchel Vision: Hyperspectral Image Analysis")
         self.resizable(width=True, height=True)
 
     
@@ -62,8 +70,9 @@ class App(ctk.CTk):
         self.greenBandNoPseudoRGB = 100
         self.blueBandNoPseudoRGB = 150
         
+        
         #saveEMRSetting
-        self.noOfBandsEMR = 447
+        self.noOfBandsEMR = 224
         self.firstBandEMR = 300
         self.lastBandEMR =  1000
         self.spectralResolution = 5
@@ -82,7 +91,6 @@ class App(ctk.CTk):
 
         
         # opens the home window by default
-
         self.mainMenu()
         self.homeWindow()
     
@@ -106,25 +114,6 @@ class App(ctk.CTk):
         self.AboutOptionMenu.set("About")
         self.AboutOptionMenu.pack(side= 'left',padx=5, pady=5)
        
-       
-    def optionmenu_callback(self,choice):
-        ## method to select function to buttons in main menu.
-        if choice == 'Exit':
-            app.destroy()
-        elif choice == 'Open':
-            self.open()
-        elif choice == 'About':
-            self.about()
-        elif choice == 'Preprocessing':
-            self.preprocessingWindow()
-        elif choice == 'Preferences':
-            self.preferencesWindow()
-        elif choice == 'Home':
-            self.homeWindow()
-        elif choice == 'Cropping/Segmentation':
-            self.croppingWindow()
-
-    
     def homeWindow(self):
         # method to show the home window.
         
@@ -137,8 +126,8 @@ class App(ctk.CTk):
         
         ## children to workMenuFrame 
         self.leftOriginalImgFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        self.rightPlotsImgFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        self.bottomSliderFrame = ctk.CTkFrame(master = self.workAreaFrame)
+        self.rightPlotsImgFrame   = ctk.CTkFrame(master = self.workAreaFrame)
+        self.bottomSliderFrame    = ctk.CTkFrame(master = self.workAreaFrame)
 
         
         self.leftOriginalImgFrame.place(x = 0, y = 0, relwidth = 0.5, relheight = 0.9)
@@ -204,25 +193,26 @@ class App(ctk.CTk):
         self.scatterPlotFigax.set_ylabel("Band 2")
         self.scatterPlotFigCanvas = FigureCanvasTkAgg(self.scatterPlotFig, master= self.rightPlotsImgFrame)
         self.scatterPlotFigCanvas.get_tk_widget().grid(row= 1, column=0,  sticky='nsew')
-
+        
+        
         # wavelength slider
         self.wavelengthSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text = "", justify ="center")
         self.wavelengthSliderCurrentValueLabel.grid(row = 0, column = 0, columnspan = 2, padx = (100,5))
-        self.wavelengthSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR, height=20,command = self.wavelengthsSlider_event)
+        self.wavelengthSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR-1, height = 20,command = self.wavelengthsSlider_event)
         self.wavelengthSlider.grid(row = 1, column = 0, columnspan=2, padx = (100,5))
         self.wavelengthsSlider_event(150)
         
         # band 1 slider
-        self.band1ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
+        self.band1ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text = "", justify ="center")
         self.band1ScatterSliderCurrentValueLabel.grid(row = 0, column =2, padx = (100,5))
-        self.band1ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR, height = 20, command = self.band1ScatterSlider_event)
+        self.band1ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR-1, height = 20, command = self.band1ScatterSlider_event)
         self.band1ScatterSlider.grid(row =1, column =2, padx = (100,5))
         self.band1ScatterSlider_event(150)
         
         # band 2 slider
-        self.band2ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text ="", justify ="center")
+        self.band2ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text = "", justify ="center")
         self.band2ScatterSliderCurrentValueLabel.grid(row = 0, column =3, padx = (5,100))
-        self.band2ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR, height = 20, command = self.band2ScatterSlider_event)
+        self.band2ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR-1, height = 20, command = self.band2ScatterSlider_event)
         self.band2ScatterSlider.grid(row =1, column=3, padx=(5,100))
         self.band2ScatterSlider_event(150)
         
@@ -230,7 +220,23 @@ class App(ctk.CTk):
         self.band1Value = 150
         self.band2Value = 150
         
-        
+    def optionmenu_callback(self,choice):
+        ## method to select function to buttons in main menu.
+        if choice == 'Exit':
+            app.destroy()
+        elif choice == 'Open':
+            self.open()
+        elif choice == 'About':
+            self.about()
+        elif choice == 'Preprocessing':
+            self.preprocessingWindow()
+        elif choice == 'Preferences':
+            self.preferencesWindow()
+        elif choice == 'Home':
+            self.homeWindow()
+        elif choice == 'Cropping/Segmentation':
+            self.croppingWindow()
+
     def full_image(self,event, tk_image, canvas):
         
         # this function takes in a image and calculates it's dimension and the window dimension
@@ -313,25 +319,15 @@ class App(ctk.CTk):
         
     def loadData(self):
         self.loadDataText = 'Opening files...'
-        print("No of bands in the EMR", self.noOfBandsEMR)
         self.currentData = readData(self.raw_img_dir)
         self.spectral_array = self.currentData.array_data
-
-        self.noOfBandsEMR = len(self.currentData.wavelength_dict.values())
-        
-        print("No of bands in the EMR", self.noOfBandsEMR)
-        print("Max values", self.currentData.max_value)
-        print("Max wavelength",self.currentData.max_wavelength)
-        print("Wavelength units",self.currentData.wavelength_units)
-        print("Wavelength dict.values",len(self.currentData.wavelength_dict.values()))
-        print("Lines",self.currentData.lines)
-        print("Default Bands",self.currentData.default_bands)
+        self.spectral_array = applybinning(self.spectral_array,2)
         self.loadDataText = 'Loading data and creating plots...'
         self.kmeanslabels, self.kmeansData = scatterPlotData(self.raw_img_dir)
         self.loadDataText = 'Unfolding data...'
         self.unfoldedData = unfold(self.spectral_array)
         self.loadDataText = 'Finishing up...'
-        self.wavelengthsSlider_event(value = 115)
+        self.wavelengthsSlider_event(value = 150)
         self.Dataloaded = True
         
     def dataLoadingScreen(self):
@@ -369,9 +365,9 @@ class App(ctk.CTk):
         if self.raw_img_dir == None:
             pass
         else:
-            print("noOfBandsEMR before slider creation and the type: ", self.noOfBandsEMR, type(self.noOfBandsEMR))
+      
             value = int(float(value))
-            print("Slider value: ", value)
+
             
             single_band_img = single_band(self.spectral_array, int(value))
             self.tk_image = Image.fromarray(np.uint8(single_band_img))
