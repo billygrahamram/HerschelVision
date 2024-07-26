@@ -23,10 +23,11 @@ import time, threading
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import matplotlib.pyplot as plt
+from utils.variable_utils import *
 
 
 ### herschelVision modules ####
-from readfile import *
+from utils.readfile import *
 ### herschelVision modules ####
 
 from plantcv import plantcv as pcv
@@ -78,8 +79,7 @@ class App(ctk.CTk):
         self.spectralResolution = 5
   
         # Empty the img_dir_record.txt file at startup. Opens and closes it, making the file empty.
-        data_path_file = os.path.join('history', 'img_dir_record.txt')
-        with open(data_path_file, 'w') as f:
+        with open(history_path, 'w') as f:
             pass
         
         ## children to main window
@@ -93,12 +93,6 @@ class App(ctk.CTk):
         # opens the home window by default
         self.mainMenu()
         self.homeWindow()
-        
-
-    
-        
-    
-
 
     def mainMenu(self):
         ## children to menuBarFrame. Menu bar buttons
@@ -127,9 +121,6 @@ class App(ctk.CTk):
         # Clear self.workAreaFrame
         for widget in self.workAreaFrame.winfo_children():
             widget.destroy()
-
-        data_path_file = os.path.join('history', 'img_dir_record.txt') 
-
         
         ## children to workMenuFrame 
         self.leftOriginalImgFrame = ctk.CTkFrame(master = self.workAreaFrame)
@@ -149,9 +140,7 @@ class App(ctk.CTk):
         
 
         # if the img_dir_record is empty. show the welcome image
-        if os.path.exists(data_path_file) and os.path.getsize(data_path_file) == 0:
-            lightThemeImgPath = 'logo/welcomeLight.png'  #this image is showed where a hsi image will be showed.
-            darkThemeImgPath = 'logo/welcomeDark.png'
+        if os.path.exists(history_path) and os.path.getsize(history_path) == 0:
             if ctk.get_appearance_mode() == 'Light': 
                 welcomeImg = Image.open(lightThemeImgPath)
             else:
@@ -286,14 +275,14 @@ class App(ctk.CTk):
         # tried to open another image but cancelled the process the previous image is still displayed.
         if not self.raw_img_dir:  # Check if raw_img_dir is empty
             # Read the path from the img_dir_record.txt file
-            with open(os.path.join('history', 'img_dir_record.txt'), 'r') as f:
+            with open(image_data_record, 'r') as f:
                 raw_img_dir = f.read().strip()
                 self.raw_img_dir = raw_img_dir
                 
         
         # Save the raw_img_dir to a text file in the history folder
         os.makedirs('history', exist_ok=True) #make sure the history folder exists. if not creates one.
-        with open(os.path.join('history', 'img_dir_record.txt'), 'w') as f:
+        with open(image_data_record, 'w') as f:
             f.write(self.raw_img_dir)
             
         ######################### RECENT FILES #################
@@ -304,7 +293,7 @@ class App(ctk.CTk):
         # This ensures that the most recent path is always at the top and there are no duplicates.
         
         # Read the existing paths
-        with open(os.path.join('history', 'recentFiles.txt'), 'r') as f:
+        with open(recent_file_path, 'r') as f:
             lines = f.read().splitlines()
 
         # If the path already exists in the file, remove it
@@ -318,7 +307,7 @@ class App(ctk.CTk):
         lines = lines[:5]
         
         # Write the paths back to the file
-        with open(os.path.join('history', 'recentFiles.txt'), 'w') as f:
+        with open(recent_file_path, 'w') as f:
             for line in lines:
                 f.write(line + '\n')
                 
@@ -486,7 +475,6 @@ class App(ctk.CTk):
         self.wavelengthPlotFigCanvas.draw()
 
     def about(self):
-        aboutImgpath= 'data/about.png'
         # creates a new top level tkinter window.
         about_window = ctk.CTkToplevel(self)
         about_window.transient(self) 
@@ -1409,9 +1397,3 @@ class App(ctk.CTk):
             B = 43
             hexCode = '#2B2B2B'
             return hexCode
-        
-        
-
-        
-app = App()
-app.mainloop()

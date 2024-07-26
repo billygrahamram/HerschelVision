@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 
 
 ### herschelVision modules ####
-from readfile import *
+from main.utils.readfile import *
 ### herschelVision modules ####
 
 from plantcv import plantcv as pcv
@@ -147,8 +147,8 @@ class App(ctk.CTk):
 
         # if the img_dir_record is empty. show the welcome image
         if os.path.exists(data_path_file) and os.path.getsize(data_path_file) == 0:
-            lightThemeImgPath = 'data/welcomeLight.png'
-            darkThemeImgPath = 'data/welcomeDark.png'
+            lightThemeImgPath = 'logo/welcomeLight.png'
+            darkThemeImgPath = 'logo/welcomeDark.png'
             if ctk.get_appearance_mode() == 'Light': 
                 welcomeImg = Image.open(lightThemeImgPath)
             else:
