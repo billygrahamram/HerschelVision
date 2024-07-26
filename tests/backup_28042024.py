@@ -93,26 +93,30 @@ class App(ctk.CTk):
         # opens the home window by default
         self.mainMenu()
         self.homeWindow()
+        
+
+    
+        
     
 
 
     def mainMenu(self):
         ## children to menuBarFrame. Menu bar buttons
-        self.FileOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Home","New","Open","Save","Export","Exit"], command=self.optionmenu_callback)
-        self.FileOptionMenu.set("File")
-        self.FileOptionMenu.pack(side= 'left',padx=5, pady=5)
+        FileOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Home","New","Open","Save","Export","Exit"], command = self.optionmenu_callback)
+        FileOptionMenu.set("File")
+        FileOptionMenu.pack(side= 'left',padx=5, pady=5)
         
-        self.EditOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Preferences","Undo"], command=self.optionmenu_callback)
-        self.EditOptionMenu.set("Edit")
-        self.EditOptionMenu.pack(side= 'left',padx=5, pady=5)
+        EditOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Preferences","Undo"], command=self.optionmenu_callback)
+        EditOptionMenu.set("Edit")
+        EditOptionMenu.pack(side= 'left',padx=5, pady=5)
         
-        self.ToolsOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Cropping/Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
-        self.ToolsOptionMenu.set("Tools")
-        self.ToolsOptionMenu.pack(side= 'left',padx=5, pady=5)
+        ToolsOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Cropping/Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
+        ToolsOptionMenu.set("Tools")
+        ToolsOptionMenu.pack(side= 'left',padx=5, pady=5)
 
-        self.AboutOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
-        self.AboutOptionMenu.set("About")
-        self.AboutOptionMenu.pack(side= 'left',padx=5, pady=5)
+        AboutOptionMenu = ctk.CTkOptionMenu(master=self.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
+        AboutOptionMenu.set("About")
+        AboutOptionMenu.pack(side= 'left',padx=5, pady=5)
        
     def homeWindow(self):
         # method to show the home window.
@@ -367,15 +371,12 @@ class App(ctk.CTk):
         else:
       
             value = int(float(value))
-
-            
             single_band_img = single_band(self.spectral_array, int(value))
             self.tk_image = Image.fromarray(np.uint8(single_band_img))
 
             # updates the current slider value
             self.wavelengthSliderCurrentValueLabel.configure(text= "Current Wavelength: " + str(int(value)))
             
-    
             # destroy the left frame for new image
             for widget in self.leftOriginalImgFrame.winfo_children():
                 widget.destroy()

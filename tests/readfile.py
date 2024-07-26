@@ -7,9 +7,11 @@ from sklearn.preprocessing import MinMaxScaler
 from PIL import Image, ImageTk
 import cv2
 import os
+import glob
 
 
 def applybinning(raw_data, value):
+    print(raw_data.shape[-1])
     if raw_data.shape[-1]!=224:
         array = raw_data
         newsize = array.shape[-1]//value
@@ -27,10 +29,25 @@ def readData(raw_img_dir):
     # with npy images the program does not support reference calibration
     _, file_extension = os.path.splitext(raw_img_dir)
 
+    
     if file_extension == '.raw':
-        # reads the data and returns a 3D numpy array
-        spectral_array = pcv.readimage(raw_img_dir, mode='envi')
-        return spectral_array
+        
+        # Get the directory of the image folder
+        dir_name = os.path.dirname(raw_img_dir)
+        
+        # Construct the file paths for the white and dark reference images
+        white_ref_path = glob.glob(os.path.join(dir_name, 'WHITEREF*.raw'))[0]
+        dark_ref_path = glob.glob(os.path.join(dir_name, 'DARKREF*.raw'))[0]
+        
+        # reads the data 
+        raw_img        = pcv.readimage(raw_img_dir, mode='envi')
+        white_ref      = pcv.readimage(white_ref_path, mode='envi')
+        dark_ref       = pcv.readimage(dark_ref_path, mode='envi')
+        
+        calibrateddata = pcv.hyperspectral.calibrate(raw_data = raw_img, white_reference= white_ref, dark_reference= dark_ref)
+        calibrateddata = calibrateddata.array_data
+        
+        return calibrateddata
 
     elif file_extension == '.npy':
         # Load the .npy file
@@ -209,7 +226,6 @@ def crop_3d_image(image, top_left, bottom_right):
 
 
 def kmeansSegmentation(array, clusters, bands):
-    print(array.shape)
     overlookBand = int(160)
     array = array[:, :, overlookBand:(overlookBand + bands)]
     X = array.reshape(-1, bands)
@@ -217,5 +233,5 @@ def kmeansSegmentation(array, clusters, bands):
     kmeans.fit(X)
     segmented_img = kmeans.cluster_centers_[kmeans.labels_]
     segmented_img = segmented_img.reshape(array.shape)
-    print (segmented_img.shape)
+    
     return segmented_img
