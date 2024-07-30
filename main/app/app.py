@@ -27,7 +27,7 @@ from utils.variable_utils import *
 
 
 ### herschelVision modules ####
-from utils.readfile import *
+from utils.image_process_utils import *
 ### herschelVision modules ####
 
 from plantcv import plantcv as pcv
@@ -316,7 +316,8 @@ class App(ctk.CTk):
         #using multithreading to show the loading dialog box while data is loading
         threading.Thread(target = self.loadData).start()
         
-        self.dataLoadingScreen()  
+        self.dataLoadingScreen()
+        print("********************1")  
         
     def loadData(self):
         self.loadDataText = 'Opening files...'
@@ -329,6 +330,24 @@ class App(ctk.CTk):
         self.loadDataText = 'Finishing up...'
         self.wavelengthsSlider_event(value = 150)
         self.Dataloaded = True
+        print("********************2")
+
+        rgb_img = create_pseudo_rgb(self.spectral_array)
+        self.tk_image = Image.fromarray(cv2.cvtColor(rgb_img, cv2.COLOR_BGR2RGB))
+                
+        for widget in self.leftOriginalImgFrame.winfo_children():
+            widget.destroy()
+        
+        openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
+                        bg = self.rgbValues(),
+                        bd = 0,
+                        highlightthickness = 0,
+                        relief = 'ridge')
+    
+        
+        openCanvas.pack(expand =True, fill='both')        
+        openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
+        openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image)) 
         
     def dataLoadingScreen(self):
         loading_window = tk.Toplevel(self)
@@ -359,6 +378,8 @@ class App(ctk.CTk):
                 loading_window.after(50, check_data_loaded) #keep checking after 50ms
                 
         check_data_loaded()
+
+        print("********************3")  
         
     def wavelengthsSlider_event(self, value):
         
