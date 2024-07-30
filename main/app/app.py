@@ -156,8 +156,8 @@ class App(ctk.CTk):
             homeCanvas.pack( expand =True, fill='both')
             homeCanvas.bind('<Configure>',lambda event: self.full_image(event, welcomeImg, canvas=homeCanvas))
         
-        elif os.path.exists(data_path_file) and os.path.getsize(data_path_file) > 0:
-            with open(data_path_file, 'r') as f:
+        elif os.path.exists(history_path) and os.path.getsize(history_path) > 0:
+            with open(history_path, 'r') as f:
                 self.raw_img_dir = f.read().strip()
                 homeCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
                         bg = self.rgbValues(),
@@ -275,14 +275,14 @@ class App(ctk.CTk):
         # tried to open another image but cancelled the process the previous image is still displayed.
         if not self.raw_img_dir:  # Check if raw_img_dir is empty
             # Read the path from the img_dir_record.txt file
-            with open(image_data_record, 'r') as f:
+            with open(history_path, 'r') as f:
                 raw_img_dir = f.read().strip()
                 self.raw_img_dir = raw_img_dir
                 
         
         # Save the raw_img_dir to a text file in the history folder
         os.makedirs('history', exist_ok=True) #make sure the history folder exists. if not creates one.
-        with open(image_data_record, 'w') as f:
+        with open(history_path, 'w') as f:
             f.write(self.raw_img_dir)
             
         ######################### RECENT FILES #################
