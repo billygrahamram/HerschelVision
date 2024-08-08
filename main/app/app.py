@@ -74,10 +74,10 @@ class App(ctk.CTk):
         
         
         #saveEMRSetting
-        self.noOfBandsEMR = 224
-        self.firstBandEMR = 300
-        self.lastBandEMR =  1000
-        self.spectralResolution = 5
+        self.noOfBandsEMR = noOfBandsEMR
+        self.firstBandEMR = firstBandEMR
+        self.lastBandEMR =  lastBandEMR
+        self.spectralResolution = spectralResolution
   
         # Empty the img_dir_record.txt file at startup. Opens and closes it, making the file empty.
         with open(history_path, 'w') as f:
@@ -195,21 +195,21 @@ class App(ctk.CTk):
         # wavelength slider
         self.wavelengthSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text = "", justify ="center")
         self.wavelengthSliderCurrentValueLabel.grid(row = 0, column = 0, columnspan = 2, padx = (100,5))
-        self.wavelengthSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR-1, height = 20,command = self.wavelengthsSlider_event)
+        self.wavelengthSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR, height = 20,command = self.wavelengthsSlider_event)
         self.wavelengthSlider.grid(row = 1, column = 0, columnspan=2, padx = (100,5))
         self.wavelengthsSlider_event(150)
         
         # band 1 slider
         self.band1ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text = "", justify ="center")
         self.band1ScatterSliderCurrentValueLabel.grid(row = 0, column =2, padx = (100,5))
-        self.band1ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR-1, height = 20, command = self.band1ScatterSlider_event)
+        self.band1ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR, height = 20, command = self.band1ScatterSlider_event)
         self.band1ScatterSlider.grid(row =1, column =2, padx = (100,5))
         self.band1ScatterSlider_event(150)
         
         # band 2 slider
         self.band2ScatterSliderCurrentValueLabel = ctk.CTkLabel(self.bottomSliderFrame, text = "", justify ="center")
         self.band2ScatterSliderCurrentValueLabel.grid(row = 0, column =3, padx = (5,100))
-        self.band2ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR-1, height = 20, command = self.band2ScatterSlider_event)
+        self.band2ScatterSlider = ctk.CTkSlider(self.bottomSliderFrame, from_ = 0, to = self.noOfBandsEMR, height = 20, command = self.band2ScatterSlider_event)
         self.band2ScatterSlider.grid(row =1, column=3, padx=(5,100))
         self.band2ScatterSlider_event(150)
         
@@ -331,7 +331,6 @@ class App(ctk.CTk):
         self.loadDataText = 'Finishing up...'
         self.wavelengthsSlider_event(value = 150)
         self.Dataloaded = True
-        create_canvas_with_image(self)
 
     def dataLoadingScreen(self):
         loading_window = tk.Toplevel(self)
@@ -373,7 +372,27 @@ class App(ctk.CTk):
         if self.raw_img_dir == None:
             pass
         else:
-            create_canvas_with_image(self,value)
+            value = int(float(value))
+            if value==self.noOfBandsEMR:
+                rgb_img = create_pseudo_rgb(self.spectral_array)
+                pil_image = Image.fromarray(cv2.cvtColor(rgb_img, cv2.COLOR_BGR2RGB))
+                self.tk_image = pil_image
+            else:
+                single_band_img = single_band(self.spectral_array, int(value))
+                self.tk_image = Image.fromarray(np.uint8(single_band_img))
+
+            for widget in self.leftOriginalImgFrame.winfo_children():
+                widget.destroy()
+            openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
+                    bg = self.rgbValues(),
+                    bd = 0,
+                    highlightthickness = 0,
+                    relief = 'ridge')
+
+            openCanvas.pack(expand =True, fill='both')
+
+            openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
+            openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image)) 
 
 
     def band1ScatterSlider_event(self, value):

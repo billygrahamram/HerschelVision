@@ -6,3 +6,8 @@ lightThemeImgPath = 'resources/images/welcomeLight.png'  #this image is showed w
 darkThemeImgPath = 'resources/images/welcomeDark.png'
 aboutImgpath= 'resources/images/about.png'
 
+# we can make this values to read from specific file
+noOfBandsEMR = 224
+firstBandEMR = 300
+lastBandEMR =  1000
+spectralResolution = 5
