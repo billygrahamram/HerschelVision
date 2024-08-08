@@ -33,6 +33,7 @@ from utils.image_process_utils import *
 from plantcv import plantcv as pcv
 import numpy as np
 import cv2
+from utils.gui_utils import *
 
 
 ctk.set_appearance_mode("system") # light, dark, system
@@ -330,25 +331,8 @@ class App(ctk.CTk):
         self.loadDataText = 'Finishing up...'
         self.wavelengthsSlider_event(value = 150)
         self.Dataloaded = True
-        print("********************2")
+        create_canvas_with_image(self)
 
-        rgb_img = create_pseudo_rgb(self.spectral_array)
-        self.tk_image = Image.fromarray(cv2.cvtColor(rgb_img, cv2.COLOR_BGR2RGB))
-                
-        for widget in self.leftOriginalImgFrame.winfo_children():
-            widget.destroy()
-        
-        openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
-                        bg = self.rgbValues(),
-                        bd = 0,
-                        highlightthickness = 0,
-                        relief = 'ridge')
-    
-        
-        openCanvas.pack(expand =True, fill='both')        
-        openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
-        openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image)) 
-        
     def dataLoadingScreen(self):
         loading_window = tk.Toplevel(self)
         loading_window.transient(self) 
@@ -379,38 +363,18 @@ class App(ctk.CTk):
                 
         check_data_loaded()
 
-        print("********************3")  
         
     def wavelengthsSlider_event(self, value):
-        
+        """
+        This event changes the image displayed on GUI for specific band value
+        @self: object
+        @value: band number along z axis
+        """
         if self.raw_img_dir == None:
             pass
         else:
-      
-            value = int(float(value))
-            single_band_img = single_band(self.spectral_array, int(value))
-            self.tk_image = Image.fromarray(np.uint8(single_band_img))
+            create_canvas_with_image(self,value)
 
-            # updates the current slider value
-            self.wavelengthSliderCurrentValueLabel.configure(text= "Current Wavelength: " + str(int(value)))
-            
-            # destroy the left frame for new image
-            for widget in self.leftOriginalImgFrame.winfo_children():
-                widget.destroy()
-            
-            openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
-                            bg = self.rgbValues(),
-                            bd = 0,
-                            highlightthickness = 0,
-                            relief = 'ridge')
-        
-            
-            openCanvas.pack(expand =True, fill='both')        
-            openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
-            openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image))
-            # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
-            # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
-            # run the self.full_image function”.
 
     def band1ScatterSlider_event(self, value):
         if self.raw_img_dir == None:
