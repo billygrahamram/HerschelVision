@@ -1,5 +1,8 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
-from src.utils.config_parser import *
+from utils.config_parser import *
 
 def test_config_parser():
     """Test the add function."""
