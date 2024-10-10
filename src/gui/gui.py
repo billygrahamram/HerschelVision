@@ -10,7 +10,7 @@
 import customtkinter as ctk
 from utils.config_parser import *
 from gui.main_menu import *
-
+from gui.home_window import *
 
 
 class App(ctk.CTk):
@@ -30,4 +30,8 @@ class App(ctk.CTk):
         self.workAreaFrame.place(rely = 0.05, y =0, relwidth =1, relheight =0.95)
 
         main_menu_obj = MainMenu(self)
+        print("&")
+        hw_menu_obj = HomeWindow(self)
+
+    
 

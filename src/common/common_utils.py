@@ -50,13 +50,14 @@ def wavelengthsSlider_event(mobj,value=150):
         
             
             openCanvas.pack(expand =True, fill='both')        
-            openCanvas.bind('<Configure>',lambda event: full_image(event, mobj.tk_image, canvas = openCanvas))
-            openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image))
+            openCanvas.bind('<Configure>',lambda event: full_image(event,mobj, mobj.tk_image, canvas = openCanvas))
+            openCanvas.bind('<1>', lambda event: getresizedImageCoordinates(event,mobj, canvas = openCanvas, image = mobj.tk_image))
             # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
             # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
             # run the self.full_image function”.
 
-def full_image(event, tk_image, canvas):
+
+def full_image(event,mobj, tk_image, canvas):
         
         # this function takes in a image and calculates it's dimension and the window dimension
         # and then makes sure that the image is fit to the window frame.
@@ -73,65 +74,67 @@ def full_image(event, tk_image, canvas):
             
             
         resized_image = tk_image.resize((width, height))
-        self.resized_tk = ImageTk.PhotoImage(resized_image)
+        mobj.resized_tk = ImageTk.PhotoImage(resized_image)
         # resized_tk = ImageTk.PhotoImage(resized_image)
         canvas.create_image(
             int(event.width/2), 
             int(event.height/2), 
             anchor = 'center',
-            image=self.resized_tk)
-        canvas.image = self.resized_tk
+            image=mobj.resized_tk)
+        canvas.image = mobj.resized_tk
 
 
-def getresizedImageCoordinates(self,event, canvas, image):
+def getresizedImageCoordinates(event,mobj, canvas, image):
     
     
         # The event object contains the x and y coordinates of the mouse click
         x, y = int(event.x), int(event.y)
         
         # Calculate the size of the borders
-        border_x = (canvas.winfo_width() - self.resized_tk.width()) / 2
-        border_y = (canvas.winfo_height() - self.resized_tk.height()) / 2
+        border_x = (canvas.winfo_width() - mobj.resized_tk.width()) / 2
+        border_y = (canvas.winfo_height() - mobj.resized_tk.height()) / 2
         
         if border_x == 0:
             if y <= int(border_y):
                 pass
-            elif y>= (int(border_y) + self.resized_tk.height()):
+            elif y>= (int(border_y) + mobj.resized_tk.height()):
                 pass
-            elif int(border_y) <= y <= (int(border_y) + self.resized_tk.height()):
+            elif int(border_y) <= y <= (int(border_y) + mobj.resized_tk.height()):
                 imgX = x-int(border_x)
                 imgY = y-int(border_y)
                 
-                x_scale_ratio = image.width / self.resized_tk.width()
-                y_scale_ratio = image.height / self.resized_tk.height()
+                x_scale_ratio = image.width / mobj.resized_tk.width()
+                y_scale_ratio = image.height / mobj.resized_tk.height()
                 
                 scaled_imgX = round(imgX * x_scale_ratio)
                 scaled_imgY = round(imgY * y_scale_ratio)
-                self.wavelengthPlot(scaled_imgX, scaled_imgY)
+                wavelengthPlot(scaled_imgX, scaled_imgY)
                 
         
         elif border_y == 0:
             if x <= int(border_x):
                 pass
-            elif x >= (int(border_x) + self.resized_tk.width()):
+            elif x >= (int(border_x) + mobj.resized_tk.width()):
                 pass
-            elif int(border_x) <= x <= (int(border_x) + self.resized_tk.width()):
+            elif int(border_x) <= x <= (int(border_x) + mobj.resized_tk.width()):
                 imgX = x-int(border_x)
                 imgY = y-int(border_y)
         
                 
-                x_scale_ratio = image.width / self.resized_tk.width()
-                y_scale_ratio = image.height / self.resized_tk.height()
+                x_scale_ratio = image.width / mobj.resized_tk.width()
+                y_scale_ratio = image.height / mobj.resized_tk.height()
                 
                 scaled_imgX = round(imgX * x_scale_ratio)
                 scaled_imgY = round(imgY * y_scale_ratio)
-                self.wavelengthPlot(scaled_imgX, scaled_imgY)
+                wavelengthPlot(mobj,scaled_imgX, scaled_imgY)
 
-def wavelengthPlot(scaled_imgX, scaled_imgY):
-        reflectance = self.spectral_array[int(scaled_imgY), int(scaled_imgX), :]
-        self.wavelengthPlotFigax.clear()
-        self.wavelengthPlotFigax.plot(np.arange(0, self.noOfBandsEMR), reflectance)
-        self.wavelengthPlotFigax.set_title("Wavelength Plot")
-        self.wavelengthPlotFigax.set_xlabel("Wavelength")
-        self.wavelengthPlotFigax.set_ylabel("Reflectance")
-        self.wavelengthPlotFigCanvas.draw()
+def wavelengthPlot(mobj,scaled_imgX, scaled_imgY):
+        print("***************************************")
+        print(mobj.obj.default_properties)
+        reflectance = mobj.spectral_array[int(scaled_imgY), int(scaled_imgX), :]
+        mobj.wavelengthPlotFigax.clear()
+        mobj.wavelengthPlotFigax.plot(np.arange(0, mobj.obj.noOfBandsEMR), reflectance)
+        mobj.wavelengthPlotFigax.set_title("Wavelength Plot")
+        mobj.wavelengthPlotFigax.set_xlabel("Wavelength")
+        mobj.wavelengthPlotFigax.set_ylabel("Reflectance")
+        mobj.wavelengthPlotFigCanvas.draw()
