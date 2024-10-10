@@ -27,7 +27,7 @@ def rgbValues(self):
 
 def wavelengthsSlider_event(mobj,value=150):
         
-        if mobj.obj.raw_img_dir == None:
+        if mobj.raw_img_dir == None:
             pass
         else:
       
@@ -43,7 +43,7 @@ def wavelengthsSlider_event(mobj,value=150):
                 widget.destroy()
             
             openCanvas = ctk.CTkCanvas(mobj.leftOriginalImgFrame, 
-                            bg = rgbValues(),
+                            bg = rgbValues(mobj),
                             bd = 0,
                             highlightthickness = 0,
                             relief = 'ridge')

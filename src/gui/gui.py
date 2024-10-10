@@ -30,7 +30,7 @@ class App(ctk.CTk):
         self.workAreaFrame.place(rely = 0.05, y =0, relwidth =1, relheight =0.95)
 
         main_menu_obj = MainMenu(self)
-        print("&")
+        print("******************3*******************")
         hw_menu_obj = HomeWindow(self)
 
     

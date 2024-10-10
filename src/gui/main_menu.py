@@ -11,6 +11,7 @@ class MainMenu():
     def __init__(self,obj):
          self.obj = obj
          self.creat_drop_down_menu()
+         print("****************888888882************")
          
     def optionmenu_callback(self,choice):
         ## method to select function to buttons in main menu.
@@ -45,6 +46,7 @@ class MainMenu():
         aboutOptionMenu = ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
         aboutOptionMenu.set("About")
         aboutOptionMenu.pack(side= 'left',padx=5, pady=5)
+        print("***************888888888881*********************")
 
     def open(self):
         # Save the raw_img_dir to a text file in the history folder
