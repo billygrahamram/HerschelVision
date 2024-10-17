@@ -19,8 +19,12 @@ class App(ctk.CTk):
         self.default_properties =  parse_properties('resources/config/default_config.property')
         self.raw_img_dir = None
         self.Dataloaded = False
+        self.start_app = True
+        self.ctk = ctk
 
-
+        # Empty the img_dir_record.txt file at startup. Opens and closes it, making the file empty.
+        with open(img_dir_record_path, 'w') as f:
+            pass
 
          ## children to main window
         self.menuBarFrame = ctk.CTkFrame(self)
@@ -30,7 +34,6 @@ class App(ctk.CTk):
         self.workAreaFrame.place(rely = 0.05, y =0, relwidth =1, relheight =0.95)
 
         main_menu_obj = MainMenu(self)
-        print("******************3*******************")
         hw_menu_obj = HomeWindow(self)
 
     

@@ -26,7 +26,8 @@ def rgbValues(self):
             return hexCode
 
 def wavelengthsSlider_event(mobj,value=150):
-        
+        print("data type; ", type(mobj))
+        print("value",mobj)
         if mobj.raw_img_dir == None:
             pass
         else:
@@ -48,13 +49,14 @@ def wavelengthsSlider_event(mobj,value=150):
                             highlightthickness = 0,
                             relief = 'ridge')
         
-            
+            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             openCanvas.pack(expand =True, fill='both')        
             openCanvas.bind('<Configure>',lambda event: full_image(event,mobj, mobj.tk_image, canvas = openCanvas))
             openCanvas.bind('<1>', lambda event: getresizedImageCoordinates(event,mobj, canvas = openCanvas, image = mobj.tk_image))
             # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
             # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
             # run the self.full_image function”.
+            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
 
 def full_image(event,mobj, tk_image, canvas):

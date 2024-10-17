@@ -1,7 +1,5 @@
-import os
 from utils.variables_utils import *
-import customtkinter as ctk
-from PIL import Image, ImageTk, ImageSequence
+from PIL import Image
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from common.common_utils import *
 import matplotlib.pyplot as plt
@@ -35,11 +33,9 @@ class HomeWindow():
         self.obj_lvl2.bottomSliderFrame.columnconfigure((0,1,2,3), weight = 1)
         
 
-        # if the img_dir_record is empty. show the welcome image
-        print(os.path.exists(img_dir_record_path))
-        print(os.path.getsize(img_dir_record_path))
-        if os.path.exists(img_dir_record_path) and os.path.getsize(img_dir_record_path) == 0:
-            print("&&&&&&&&&&&&&&&&&&&&&&77")
+        
+        if self.obj_lvl2.start_app:
+            print("first time start")
             
             if ctk.get_appearance_mode() == 'Light': 
                 welcomeImg = Image.open(lightThemeImgPath)
@@ -55,10 +51,12 @@ class HomeWindow():
             
             homeCanvas.pack( expand =True, fill='both')
             homeCanvas.bind('<Configure>',lambda event: full_image(event,self.obj_lvl2, welcomeImg, canvas=homeCanvas))
+            self.obj_lvl2.start_app = False
+            self.obj_lvl2.raw_img_dir == None
         
-        elif os.path.exists(img_dir_record_path) and os.path.getsize(img_dir_record_path) > 0:
+        else:
             with open(img_dir_record_path, 'r') as f:
-                print("&&&&&&&&&&&&&&&&333&&&&&&77")
+                print("not first time start")
                 self.obj_lvl2.raw_img_dir = f.read().strip()
                 homeCanvas = ctk.CTkCanvas(self.obj_lvl2.leftOriginalImgFrame, 
                         bg = rgbValues(self.obj_lvl2),
@@ -99,6 +97,7 @@ class HomeWindow():
         self.obj_lvl2.wavelengthSliderCurrentValueLabel.grid(row = 0, column = 0, columnspan = 2, padx = (100,5))
         self.obj_lvl2.wavelengthSlider = ctk.CTkSlider(self.obj_lvl2.bottomSliderFrame, from_ = 0, to = noOfBandsEMR-1, height = 20,command = wavelengthsSlider_event)
         self.obj_lvl2.wavelengthSlider.grid(row = 1, column = 0, columnspan=2, padx = (100,5))
+        print(self.obj_lvl2.raw_img_dir)
         wavelengthsSlider_event(self.obj_lvl2)
 
     

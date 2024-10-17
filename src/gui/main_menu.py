@@ -1,4 +1,3 @@
-import customtkinter as ctk
 import os
 import tkinter as tk
 import threading
@@ -11,7 +10,6 @@ class MainMenu():
     def __init__(self,obj):
          self.obj = obj
          self.creat_drop_down_menu()
-         print("****************888888882************")
          
     def optionmenu_callback(self,choice):
         ## method to select function to buttons in main menu.
@@ -46,8 +44,7 @@ class MainMenu():
         aboutOptionMenu = ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
         aboutOptionMenu.set("About")
         aboutOptionMenu.pack(side= 'left',padx=5, pady=5)
-        print("***************888888888881*********************")
-
+        
     def open(self):
         # Save the raw_img_dir to a text file in the history folder
         os.makedirs(data_dir_path, exist_ok=True) #make sure the history folder exists. if not creates one.
@@ -107,17 +104,19 @@ class MainMenu():
         self.currentData = readData(self.obj.raw_img_dir)
         self.spectral_array = self.currentData
         self.spectral_array = applybinning(self.spectral_array,2)
+        self.obj.spectral_array = self.spectral_array
         self.loadDataText = 'Loading data and creating plots...'
         self.kmeanslabels, self.kmeansData = scatterPlotData(self.obj.raw_img_dir)
         self.loadDataText = 'Unfolding data...'
         self.unfoldedData = unfold(self.spectral_array)
         self.loadDataText = 'Finishing up...'
-        wavelengthsSlider_event(self)
-        self.Dataloaded = True
+        wavelengthsSlider_event(self.obj)
+        self.obj.Dataloaded = True
+        print("end")
 
     def dataLoadingScreen(self):
-        loading_window = tk.Toplevel(self)
-        loading_window.transient(self) 
+        loading_window = tk.Toplevel(self.obj)
+        loading_window.transient(self.obj) 
         loading_window.title("Loading data")
         loading_window.geometry("500x200")
         loading_window.resizable(width=False, height=False)
@@ -136,7 +135,7 @@ class MainMenu():
         progress.start()
         
         def check_data_loaded():
-            if self.Dataloaded:
+            if self.obj.Dataloaded:
                 loading_window.destroy()
                 
             else:
