@@ -6,7 +6,7 @@ from utils.io_utils import *
 from utils.data_preprocessing_utils import *
 from gui.preprocess import *
 import customtkinter as ctk
-
+from gui.home_window import *
 
 class MainMenu(ctk.CTkFrame):
     def __init__(self,parent):
@@ -30,7 +30,8 @@ class MainMenu(ctk.CTkFrame):
         elif choice == 'Preferences':
             self.preferencesWindow()
         elif choice == 'Home':
-            self.homeWindow()
+            hw_object = HomeWindow(self.parent)
+            hw_object.home_menu()
         elif choice == 'Cropping/Segmentation':
             self.croppingWindow()
 
