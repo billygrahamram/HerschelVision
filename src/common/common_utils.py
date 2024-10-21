@@ -58,6 +58,37 @@ def wavelengthsSlider_event(mobj,value=150):
             # run the self.full_image function”.
             print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
+def band1ScatterSlider_event(mobj,value=150):
+        print("data type; ", type(mobj))
+        print("value",mobj)
+        if mobj.raw_img_dir== None:
+            pass
+        else:
+            mobj.band1ScatterSliderCurrentValueLabel.configure(text = "First Band: " + str(int(value)))
+            mobj.band1Value = int(value)
+            mobj.scatterPlotFigax.clear()
+            mobj.scatterPlotFigax.scatter(mobj.kmeansData[:, mobj.band1Value], 
+                                          mobj.kmeansData[:, mobj.band2Value], 
+                                          c=mobj.kmeanslabels, s=10)
+            mobj.scatterPlotFigax.set_title("Scatter Plot")
+            mobj.scatterPlotFigax.set_xlabel("Band 1")
+            mobj.scatterPlotFigax.set_ylabel("Band 2")
+            mobj.scatterPlotFigax.figure.canvas.draw()
+
+def band2ScatterSlider_event(mobj,value=150):
+        if mobj.raw_img_dir == None:
+            pass
+        else:
+            mobj.band2ScatterSliderCurrentValueLabel.configure(text= "Second Band: " + str(int(value)))
+            mobj.band2Value = int(value)
+            mobj.scatterPlotFigax.clear()
+            mobj.scatterPlotFigax.scatter(mobj.kmeansData[:, mobj.band1Value], 
+                                          mobj.kmeansData[:, mobj.band2Value], 
+                                          c=mobj.kmeanslabels, s=10)
+            mobj.scatterPlotFigax.set_title("Scatter Plot")
+            mobj.scatterPlotFigax.set_xlabel("Band 1")
+            mobj.scatterPlotFigax.set_ylabel("Band 2")
+            mobj.scatterPlotFigax.figure.canvas.draw()
 
 def full_image(event,mobj, tk_image, canvas):
         

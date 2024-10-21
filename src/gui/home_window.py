@@ -68,7 +68,7 @@ class HomeWindow():
                 homeCanvas.bind('<Configure>',lambda event: full_image(event,self.obj_lvl2 , self.obj_lvl2 .tk_image, canvas=homeCanvas))
                 homeCanvas.bind('<1>', lambda event: getresizedImageCoordinates(event,self.obj_lvl2 ,canvas = homeCanvas, image = self.obj_lvl2.tk_image))
 
-        
+        print(self.obj_lvl2.default_properties)
         noOfBandsEMR = self.obj_lvl2.default_properties.get('noOfBandsEMR')
         
         #### wavelength plot ######
@@ -100,4 +100,16 @@ class HomeWindow():
         print(self.obj_lvl2.raw_img_dir)
         wavelengthsSlider_event(self.obj_lvl2)
 
-    
+        # band 1 slider
+        self.obj_lvl2.band1ScatterSliderCurrentValueLabel = self.obj_lvl2.ctk.CTkLabel(self.obj_lvl2.bottomSliderFrame, text = "", justify ="center")
+        self.obj_lvl2.band1ScatterSliderCurrentValueLabel.grid(row = 0, column =2, padx = (100,5))
+        self.obj_lvl2.band1ScatterSlider = self.obj_lvl2.ctk.CTkSlider(self.obj_lvl2.bottomSliderFrame, from_ = 0, to = noOfBandsEMR-1, height = 20, command = band1ScatterSlider_event)
+        self.obj_lvl2.band1ScatterSlider.grid(row =1, column =2, padx = (100,5))
+        band1ScatterSlider_event(self.obj_lvl2)
+
+        # band 2 slider
+        self.obj_lvl2.band2ScatterSliderCurrentValueLabel = self.obj_lvl2.ctk.CTkLabel(self.obj_lvl2.bottomSliderFrame, text = "", justify ="center")
+        self.obj_lvl2.band2ScatterSliderCurrentValueLabel.grid(row = 0, column =3, padx = (5,100))
+        self.obj_lvl2.band2ScatterSlider = self.obj_lvl2.ctk.CTkSlider(self.obj_lvl2.bottomSliderFrame, from_ = 0, to = noOfBandsEMR-1, height = 20, command = band2ScatterSlider_event)
+        self.obj_lvl2.band2ScatterSlider.grid(row =1, column=3, padx=(5,100))
+        band2ScatterSlider_event(self.obj_lvl2)

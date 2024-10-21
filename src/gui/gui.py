@@ -33,7 +33,12 @@ class App(ctk.CTk):
         self.menuBarFrame.place(x=0, y=0, relwidth = 1, relheight = 0.05)
         self.workAreaFrame.place(rely = 0.05, y =0, relwidth =1, relheight =0.95)
 
+        # set default values
+        self.band1Value = 150
+        self.band2Value = 150
+
         main_menu_obj = MainMenu(self)
+        
         hw_menu_obj = HomeWindow(self)
 
     

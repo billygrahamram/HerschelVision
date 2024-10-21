@@ -106,7 +106,7 @@ class MainMenu():
         self.spectral_array = applybinning(self.spectral_array,2)
         self.obj.spectral_array = self.spectral_array
         self.loadDataText = 'Loading data and creating plots...'
-        self.kmeanslabels, self.kmeansData = scatterPlotData(self.obj.raw_img_dir)
+        self.obj.kmeanslabels, self.obj.kmeansData = scatterPlotData(self.obj.raw_img_dir)
         self.loadDataText = 'Unfolding data...'
         self.unfoldedData = unfold(self.spectral_array)
         self.loadDataText = 'Finishing up...'
