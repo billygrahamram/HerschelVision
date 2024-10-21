@@ -21,6 +21,18 @@ def applybinning(raw_data, value):
     else:
         return(raw_data)
     
+def create_pseudo_rgb(data_ref_array):
+    blue_band = data_ref_array[..., 24]
+    green_band = data_ref_array[..., 70]
+    red_band = data_ref_array[..., 95]
+
+    blue_band_normalized = cv2.normalize(blue_band, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    green_band_normalized = cv2.normalize(green_band, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    red_band_normalized = cv2.normalize(red_band, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+
+    rgb = cv2.merge((blue_band_normalized, green_band_normalized, red_band_normalized))
+
+    return rgb
 
 def scatterPlotData(raw_img_dir):
     

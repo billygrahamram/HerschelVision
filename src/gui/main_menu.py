@@ -6,9 +6,9 @@ from utils.io_utils import *
 from utils.data_preprocessing_utils import *
 from common.common_utils import *
 
-class MainMenu():
-    def __init__(self,obj):
-         self.obj = obj
+class MainMenu(ctk.CTkFrame):
+    def __init__(self,parent):
+         self.parent = parent
          self.creat_drop_down_menu()
          
     def optionmenu_callback(self,choice):
@@ -29,26 +29,26 @@ class MainMenu():
             self.croppingWindow()
 
     def creat_drop_down_menu(self):
-        fileOptionMenu = self.obj.ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Home","New","Open","Save","Export","Exit"], command = self.optionmenu_callback)
+        fileOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Home","New","Open","Save","Export","Exit"], command = self.optionmenu_callback)
         fileOptionMenu.set("File")
         fileOptionMenu.pack(side= 'left',padx=5, pady=5)
 
-        editOptionMenu = self.obj.ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Preferences","Undo"], command=self.optionmenu_callback)
+        editOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Preferences","Undo"], command=self.optionmenu_callback)
         editOptionMenu.set("Edit")
         editOptionMenu.pack(side= 'left',padx=5, pady=5)
         
-        toolsOptionMenu = self.obj.ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Cropping/Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
+        toolsOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Cropping/Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
         toolsOptionMenu.set("Tools")
         toolsOptionMenu.pack(side= 'left',padx=5, pady=5)
 
-        aboutOptionMenu = self.obj.ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
+        aboutOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
         aboutOptionMenu.set("About")
         aboutOptionMenu.pack(side= 'left',padx=5, pady=5)
         
     def open(self):
         # Save the raw_img_dir to a text file in the history folder
         os.makedirs(data_dir_path, exist_ok=True) #make sure the history folder exists. if not creates one.
-        self.obj.raw_img_dir = tk.filedialog.askopenfilename(initialdir="/", 
+        self.parent.raw_img_dir = tk.filedialog.askopenfilename(initialdir="/", 
                                                 title="Select file",
                                                 filetypes = [("Raw Hyperspectral Image", "*.raw"),
                                                              ("Numpy Array", "*.npy")
@@ -56,16 +56,16 @@ class MainMenu():
         
         # this makes sure that if the user selected an image and then
         # tried to open another image but cancelled the process the previous image is still displayed.
-        if not self.obj.raw_img_dir:  # Check if raw_img_dir is empty
+        if not self.parent.raw_img_dir:  # Check if raw_img_dir is empty
             # Read the path from the img_dir_record.txt file
             with open(img_dir_record_path, 'r') as f:
                 raw_img_dir = f.read().strip()
-                self.obj.raw_img_dir = raw_img_dir
+                self.parent.raw_img_dir = raw_img_dir
                 
         
         
         with open(img_dir_record_path, 'w') as f:
-            f.write(self.obj.raw_img_dir)
+            f.write(self.parent.raw_img_dir)
             
         ######################### RECENT FILES #################
         # first reads all the existing paths from the file into a list. 
@@ -79,11 +79,11 @@ class MainMenu():
             lines = f.read().splitlines()
 
         # If the path already exists in the file, remove it
-        if self.obj.raw_img_dir in lines:
-            lines.remove(self.obj.raw_img_dir)
+        if self.parent.raw_img_dir in lines:
+            lines.remove(self.parent.raw_img_dir)
 
         # Add the path to the top of the list
-        lines.insert(0, self.obj.raw_img_dir)
+        lines.insert(0, self.parent.raw_img_dir)
 
         # Only keep the 5 most recent paths
         lines = lines[:5]
@@ -93,7 +93,7 @@ class MainMenu():
             for line in lines:
                 f.write(line + '\n')
                 
-        self.obj.Dataloaded = False
+        self.parent.Dataloaded = False
         #using multithreading to show the loading dialog box while data is loading
         threading.Thread(target = self.loadData).start()
         
@@ -101,22 +101,23 @@ class MainMenu():
 
     def loadData(self):
         self.loadDataText = 'Opening files...'
-        self.currentData = readData(self.obj.raw_img_dir)
+        self.currentData = readData(self.parent.raw_img_dir)
         self.spectral_array = self.currentData
         self.spectral_array = applybinning(self.spectral_array,2)
-        self.obj.spectral_array = self.spectral_array
+        self.parent.spectral_array = self.spectral_array
+        self.parent.rgb_data = create_pseudo_rgb(self.spectral_array)
         self.loadDataText = 'Loading data and creating plots...'
-        self.obj.kmeanslabels, self.obj.kmeansData = scatterPlotData(self.obj.raw_img_dir)
+        self.parent.kmeanslabels, self.parent.kmeansData = scatterPlotData(self.parent.raw_img_dir)
         self.loadDataText = 'Unfolding data...'
         self.unfoldedData = unfold(self.spectral_array)
         self.loadDataText = 'Finishing up...'
-        wavelengthsSlider_event(self.obj)
-        self.obj.Dataloaded = True
+        wavelengthsSlider_event(self.parent)
+        self.parent.Dataloaded = True
         print("end")
 
     def dataLoadingScreen(self):
-        loading_window = tk.Toplevel(self.obj)
-        loading_window.transient(self.obj) 
+        loading_window = tk.Toplevel(self.parent)
+        loading_window.transient(self.parent) 
         loading_window.title("Loading data")
         loading_window.geometry("500x200")
         loading_window.resizable(width=False, height=False)
@@ -126,16 +127,16 @@ class MainMenu():
         loading_window.attributes('-topmost', True)
         loading_window.after_idle(loading_window.attributes, '-topmost', False)
         
-        self.loadDataLabel = self.obj.ctk.CTkLabel(master=loading_window, text = self.loadDataText, justify = "center", font = ("Helvetica", 20))
+        self.loadDataLabel = self.parent.ctk.CTkLabel(master=loading_window, text = self.loadDataText, justify = "center", font = ("Helvetica", 20))
         self.loadDataLabel.pack(side = 'top', expand = True, fill = 'x', pady =(10,0))
         
         # Create a progress bar
-        progress = self.obj.ctk.CTkProgressBar(loading_window, width = 150, height = 30, mode='indeterminate', orientation='horizontal')
+        progress = self.parent.ctk.CTkProgressBar(loading_window, width = 150, height = 30, mode='indeterminate', orientation='horizontal')
         progress.pack(side = 'top',expand=True, fill='x', padx = 80, pady=(0,80))
         progress.start()
         
         def check_data_loaded():
-            if self.obj.Dataloaded:
+            if self.parent.Dataloaded:
                 loading_window.destroy()
                 
             else:

@@ -28,10 +28,12 @@ def rgbValues(self):
 def wavelengthsSlider_event(mobj,value=150):
         print("data type; ", type(mobj))
         print("value",mobj)
+        print(mobj.raw_img_dir)
+
         if mobj.raw_img_dir == None:
             pass
         else:
-      
+    
             value = int(float(value))
             single_band_img = single_band(mobj.spectral_array, int(value))
             mobj.tk_image = Image.fromarray(np.uint8(single_band_img))
