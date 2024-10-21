@@ -1,13 +1,13 @@
 from utils.variables_utils import *
 from PIL import Image
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from common.common_utils import *
 import matplotlib.pyplot as plt
 import customtkinter as ctk
 
 
 class HomeWindow(ctk.CTkFrame):
     def __init__(self,parent):
+        super().__init__(parent)
         self.parent = parent
         self.home_menu()
 
@@ -46,13 +46,14 @@ class HomeWindow(ctk.CTkFrame):
                 
 
             homeCanvas = ctk.CTkCanvas(self.parent.leftOriginalImgFrame, 
-                            bg = rgbValues(self.parent),
+                            bg = self.parent.rgbValues(),
                             bd = 0,
                             highlightthickness=0,
                             relief='ridge')
             
             homeCanvas.pack( expand =True, fill='both')
-            homeCanvas.bind('<Configure>',lambda event: full_image(event,self.parent, welcomeImg, canvas=homeCanvas))
+            homeCanvas.bind('<Configure>',lambda event: self.parent.full_image(event, welcomeImg, canvas=homeCanvas))
+
             self.parent.start_app = False
             self.parent.raw_img_dir == None
         
@@ -61,22 +62,22 @@ class HomeWindow(ctk.CTkFrame):
                 print("not first time start")
                 self.parent.raw_img_dir = f.read().strip()
                 homeCanvas = ctk.CTkCanvas(self.parent.leftOriginalImgFrame, 
-                        bg = rgbValues(self.parent),
+                        bg = self.parent.rgbValues(self.parent),
                         bd = 0,
                         highlightthickness=0,
                         relief='ridge')
         
                 homeCanvas.pack(expand =True, fill='both')
-                homeCanvas.bind('<Configure>',lambda event: full_image(event,self.parent , self.parent .tk_image, canvas=homeCanvas))
-                homeCanvas.bind('<1>', lambda event: getresizedImageCoordinates(event,self.parent ,canvas = homeCanvas, image = self.parent.tk_image))
+                homeCanvas.bind('<Configure>',lambda event: self.parent.full_image(event, self.parent.tk_image, canvas=homeCanvas))
+                homeCanvas.bind('<1>', lambda event: self.parent.getresizedImageCoordinates(event,canvas = homeCanvas, image = self.parent.tk_image))
 
         print(self.parent.default_properties)
         noOfBandsEMR = self.parent.default_properties.get('noOfBandsEMR')
         
         #### wavelength plot ######
         self.parent.wavelengthPlotFig, self.parent.wavelengthPlotFigax = plt.subplots()
-        self.parent.wavelengthPlotFig.set_facecolor(rgbValues(self.parent))
-        self.parent.wavelengthPlotFigax.set_facecolor(rgbValues(self.parent))
+        self.parent.wavelengthPlotFig.set_facecolor(self.parent.rgbValues())
+        self.parent.wavelengthPlotFigax.set_facecolor(self.parent.rgbValues())
         self.parent.wavelengthPlotFigax.set_title("Wavelength Plot")
         self.parent.wavelengthPlotFigax.set_xlabel("Wavelength")
         self.parent.wavelengthPlotFigax.set_ylabel("Reflectance")
@@ -85,8 +86,8 @@ class HomeWindow(ctk.CTkFrame):
 
         #### scatter plot ######
         self.parent.scatterPlotFig, self.parent.scatterPlotFigax = plt.subplots()
-        self.parent.scatterPlotFig.set_facecolor(rgbValues(self.parent))
-        self.parent.scatterPlotFigax.set_facecolor(rgbValues(self.parent))
+        self.parent.scatterPlotFig.set_facecolor(self.parent.rgbValues())
+        self.parent.scatterPlotFigax.set_facecolor(self.parent.rgbValues())
         self.parent.scatterPlotFigax.set_title("Scatter Plot")
         self.parent.scatterPlotFigax.set_xlabel("Band 1")
         self.parent.scatterPlotFigax.set_ylabel("Band 2")
@@ -95,29 +96,23 @@ class HomeWindow(ctk.CTkFrame):
         
         
         # wavelength slider
-        self.parent.wavelengthSliderCurrentValueLabel = ctk.CTkLabel(self.parent.bottomSliderFrame, text = "", justify ="center")
+        self.parent.wavelengthSliderCurrentValueLabel = self.parent.ctk.CTkLabel(self.parent.bottomSliderFrame, text = "", justify ="center")
         self.parent.wavelengthSliderCurrentValueLabel.grid(row = 0, column = 0, columnspan = 2, padx = (100,5))
-        self.parent.wavelengthSlider = ctk.CTkSlider(
-            self.parent.bottomSliderFrame, 
-            from_=0, 
-            to=noOfBandsEMR-1, 
-            height=20, 
-            command=lambda value: wavelengthsSlider_event(self.parent.wavelengthSlider, value)
-        )
+        self.parent.wavelengthSlider = self.parent.ctk.CTkSlider(self.parent.bottomSliderFrame, from_ = 0, to = noOfBandsEMR-1, height = 20,command = self.parent.wavelengthsSlider_event)
         self.parent.wavelengthSlider.grid(row = 1, column = 0, columnspan=2, padx = (100,5))
         print(self.parent.raw_img_dir)
-        wavelengthsSlider_event(self.parent)
+        self.parent.wavelengthsSlider_event()
 
         # band 1 slider
         self.parent.band1ScatterSliderCurrentValueLabel = self.parent.ctk.CTkLabel(self.parent.bottomSliderFrame, text = "", justify ="center")
         self.parent.band1ScatterSliderCurrentValueLabel.grid(row = 0, column =2, padx = (100,5))
-        self.parent.band1ScatterSlider = self.parent.ctk.CTkSlider(self.parent.bottomSliderFrame, from_ = 0, to = noOfBandsEMR-1, height = 20, command = band1ScatterSlider_event)
+        self.parent.band1ScatterSlider = self.parent.ctk.CTkSlider(self.parent.bottomSliderFrame, from_ = 0, to = noOfBandsEMR-1, height = 20, command = self.parent.band1ScatterSlider_event)
         self.parent.band1ScatterSlider.grid(row =1, column =2, padx = (100,5))
-        band1ScatterSlider_event(self.parent)
+        self.parent.band1ScatterSlider_event()
 
         # band 2 slider
         self.parent.band2ScatterSliderCurrentValueLabel = self.parent.ctk.CTkLabel(self.parent.bottomSliderFrame, text = "", justify ="center")
         self.parent.band2ScatterSliderCurrentValueLabel.grid(row = 0, column =3, padx = (5,100))
-        self.parent.band2ScatterSlider = self.parent.ctk.CTkSlider(self.parent.bottomSliderFrame, from_ = 0, to = noOfBandsEMR-1, height = 20, command = band2ScatterSlider_event)
+        self.parent.band2ScatterSlider = self.parent.ctk.CTkSlider(self.parent.bottomSliderFrame, from_ = 0, to = noOfBandsEMR-1, height = 20, command = self.parent.band2ScatterSlider_event)
         self.parent.band2ScatterSlider.grid(row =1, column=3, padx=(5,100))
-        band2ScatterSlider_event(self.parent)
+        self.parent.band2ScatterSlider_event()

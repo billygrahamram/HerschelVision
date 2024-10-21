@@ -8,6 +8,7 @@ from common.common_utils import *
 
 class MainMenu(ctk.CTkFrame):
     def __init__(self,parent):
+         super().__init__(parent)
          self.parent = parent
          self.creat_drop_down_menu()
          
@@ -111,7 +112,7 @@ class MainMenu(ctk.CTkFrame):
         self.loadDataText = 'Unfolding data...'
         self.unfoldedData = unfold(self.spectral_array)
         self.loadDataText = 'Finishing up...'
-        wavelengthsSlider_event(self.parent)
+        self.parent.wavelengthsSlider_event()
         self.parent.Dataloaded = True
         print("end")
 
