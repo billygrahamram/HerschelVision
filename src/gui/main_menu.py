@@ -45,6 +45,9 @@ class MainMenu(ctk.CTkFrame):
         aboutOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
         aboutOptionMenu.set("About")
         aboutOptionMenu.pack(side= 'left',padx=5, pady=5)
+
+        show_image_button = self.parent.ctk.CTkButton(self.parent.menuBarFrame, text="Show RGB Image", command=self.parent.show_psuedo_rgb)
+        show_image_button.pack(side='left', padx=5, pady=5)
         
     def open(self):
         # Save the raw_img_dir to a text file in the history folder
@@ -112,7 +115,8 @@ class MainMenu(ctk.CTkFrame):
         self.loadDataText = 'Unfolding data...'
         self.unfoldedData = unfold(self.spectral_array)
         self.loadDataText = 'Finishing up...'
-        self.parent.wavelengthsSlider_event()
+        #self.parent.wavelengthsSlider_event()
+        self.parent.show_psuedo_rgb()
         self.parent.Dataloaded = True
         print("end")
 
@@ -145,6 +149,3 @@ class MainMenu(ctk.CTkFrame):
                 loading_window.after(50, check_data_loaded) #keep checking after 50ms
                 
         check_data_loaded()
-
-
-

@@ -116,3 +116,8 @@ class HomeWindow(ctk.CTkFrame):
         self.parent.band2ScatterSlider = self.parent.ctk.CTkSlider(self.parent.bottomSliderFrame, from_ = 0, to = noOfBandsEMR-1, height = 20, command = self.parent.band2ScatterSlider_event)
         self.parent.band2ScatterSlider.grid(row =1, column=3, padx=(5,100))
         self.parent.band2ScatterSlider_event()
+
+        #add show rgb image button
+        self.parent.show_image_button = self.parent.ctk.CTkButton(self, text="Show RGB Image", command=self.parent.show_psuedo_rgb)
+        #self.parent.show_image_button.grid(row=1, column=4, padx=(10, 5), pady=(10, 5), sticky="e")  # Place the button above the label
+        self.parent.show_image_button.grid(row=0, column=5, columnspan=2, pady=(10, 5), sticky="n")  # Center button at the top

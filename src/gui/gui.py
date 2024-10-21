@@ -14,6 +14,8 @@ from utils.data_preprocessing_utils import *
 from common.common_utils import *
 from gui.main_menu import MainMenu  # Import the MainMenu subclass
 from gui.home_window import HomeWindow 
+from tkinter import  messagebox
+
 
 class App(ctk.CTk):
     def __init__(self):
@@ -23,6 +25,7 @@ class App(ctk.CTk):
         self.Dataloaded = False
         self.start_app = True
         self.ctk = ctk
+        self.spectral_array = None
 
         self.title(self.default_properties.get("title"))
         self.geometry(self.default_properties.get("geometry"))
@@ -52,9 +55,6 @@ class App(ctk.CTk):
         self.mainloop()
 
     def wavelengthsSlider_event(self,value=150):
-        print("*******",value)
-        print("*******",self.raw_img_dir)
-
         if self.raw_img_dir == None:
             pass
         else:
@@ -216,3 +216,23 @@ class App(ctk.CTk):
         self.wavelengthPlotFigax.set_xlabel("Wavelength")
         self.wavelengthPlotFigax.set_ylabel("Reflectance")
         self.wavelengthPlotFigCanvas.draw()
+
+    def show_psuedo_rgb(self):
+            if self.spectral_array is None:
+                messagebox.showinfo("Info", "Please load an image first.")
+                return
+            rgb = create_pseudo_rgb(self.spectral_array)
+            self.tk_image = Image.fromarray(np.uint8(rgb))
+
+            # destroy the left frame for new image
+            for widget in self.leftOriginalImgFrame.winfo_children():
+                widget.destroy()
+            
+            openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
+                            bg = self.rgbValues(),
+                            bd = 0,
+                            highlightthickness = 0,
+                            relief = 'ridge')
+            openCanvas.pack(expand =True, fill='both')        
+            openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
+            openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image))

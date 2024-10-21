@@ -31,8 +31,9 @@ def create_pseudo_rgb(data_ref_array):
     red_band_normalized = cv2.normalize(red_band, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
 
     rgb = cv2.merge((blue_band_normalized, green_band_normalized, red_band_normalized))
+    rgb_image = cv2.cvtColor(rgb, cv2.COLOR_BGR2RGB)
 
-    return rgb
+    return rgb_image
 
 def scatterPlotData(raw_img_dir):
     
