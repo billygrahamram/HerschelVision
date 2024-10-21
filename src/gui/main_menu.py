@@ -4,24 +4,29 @@ import threading
 from utils.variables_utils import *
 from utils.io_utils import *
 from utils.data_preprocessing_utils import *
-from common.common_utils import *
+from gui.preprocess import *
+import customtkinter as ctk
+
 
 class MainMenu(ctk.CTkFrame):
     def __init__(self,parent):
          super().__init__(parent)
          self.parent = parent
+         self.app = parent
+         self.unfoldedData = None
          self.creat_drop_down_menu()
          
     def optionmenu_callback(self,choice):
         ## method to select function to buttons in main menu.
         if choice == 'Exit':
-            app.destroy()
+            self.app.destroy()
         elif choice == 'Open':
             self.open()
         elif choice == 'About':
             self.about()
         elif choice == 'Preprocessing':
-            self.preprocessingWindow()
+            preprocess_object = Preprocess(self)
+            preprocess_object.preprocessingWindow()
         elif choice == 'Preferences':
             self.preferencesWindow()
         elif choice == 'Home':
@@ -149,3 +154,37 @@ class MainMenu(ctk.CTkFrame):
                 loading_window.after(50, check_data_loaded) #keep checking after 50ms
                 
         check_data_loaded()
+
+    def about(self):
+        # creates a new top level tkinter window.
+        about_window = self.parent.ctk.CTkToplevel(self)
+        about_window.transient(self) 
+        about_window.title("About")
+        about_window.geometry("500x500")
+        about_window.resizable(width=False, height=False)
+
+        # routes all event for the app to about window.
+        # user cannot intereact with app until about window is closed.
+        about_window.grab_set()
+        
+        # makes the popup window appear on top of the application window
+        # instead of a seperate desktop window.
+        about_window.attributes('-topmost', True)
+        about_window.after_idle(about_window.attributes, '-topmost', False)
+        
+        # Load the image
+        aboutImg = Image.open(aboutImgpath)
+        # Resize the image to fit the window
+        aboutImg = aboutImg.resize((500,500))
+        aboutImg_tk = ImageTk.PhotoImage(aboutImg)
+        
+        # Keep a reference to the image
+        about_window.aboutImg_tk = aboutImg_tk
+        
+        aboutCanvas = tk.Canvas(master = about_window,
+                                bd = 0,
+                                highlightthickness = 0,
+                                relief = 'ridge'
+                                )
+        aboutCanvas.create_image(0, 0, image=aboutImg_tk, anchor='nw')
+        aboutCanvas.pack(expand=True, fill='both')

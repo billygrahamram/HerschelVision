@@ -85,3 +85,39 @@ def single_band(arr, band):
     
     image = band.astype(np.uint8)
     return image
+
+def preprocessing(selection, data, w, p):
+    
+    print(data.shape)
+    if selection == "Standard Normal Variate":
+        snvData = snv(data)
+        return snvData
+        
+    elif selection == "Savitzky-Golay (first)":
+ 
+        sgoneData= savgol_filter(data, window_length=w, polyorder = p, deriv=1)
+        return sgoneData
+       
+    elif selection == "Savitzky-Golay (second)":
+   
+        sgtwoData = savgol_filter(data, window_length=w, polyorder = p, deriv=2)
+        return sgtwoData
+        
+    elif selection == "Normalization":
+        normalizedData = normalize(data)
+        return normalizedData
+    elif selection == "None (pass)":
+        return data
+    
+def snv(input_data):
+
+    data_snv = np.zeros_like(input_data)
+    for i in range(data_snv.shape[0]):
+        # Apply correction
+        data_snv[i,:] = (input_data[i,:] - np.mean(input_data[i,:])) / np.std(input_data[i,:])
+    
+    return data_snv
+
+def normalize(data):
+    scaler = MinMaxScaler()
+    return scaler.fit_transform(data)

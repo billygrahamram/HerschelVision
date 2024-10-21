@@ -11,7 +11,6 @@ import customtkinter as ctk
 from utils.config_parser import *
 from utils.variables_utils import *
 from utils.data_preprocessing_utils import *
-from common.common_utils import *
 from gui.main_menu import MainMenu  # Import the MainMenu subclass
 from gui.home_window import HomeWindow 
 from tkinter import  messagebox
@@ -26,6 +25,7 @@ class App(ctk.CTk):
         self.start_app = True
         self.ctk = ctk
         self.spectral_array = None
+        self.running = True
 
         self.title(self.default_properties.get("title"))
         self.geometry(self.default_properties.get("geometry"))

@@ -1,2 +1,3 @@
 /home/developer/SGCPostDOC/data/sample/B3_TR3_R1T11_A3T2_2023-11-30_17-28-37/capture/B3_TR3_R1T11_A3T2_2023-11-30_17-28-37.raw
+
 /home/developer/SGCPostDOC/data/sample/1_G121R3_2024-04-02_18-14-49/capture/1_G121R3_2024-04-02_18-14-49.raw
