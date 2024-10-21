@@ -29,19 +29,19 @@ class MainMenu():
             self.croppingWindow()
 
     def creat_drop_down_menu(self):
-        fileOptionMenu = ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Home","New","Open","Save","Export","Exit"], command = self.optionmenu_callback)
+        fileOptionMenu = self.obj.ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Home","New","Open","Save","Export","Exit"], command = self.optionmenu_callback)
         fileOptionMenu.set("File")
         fileOptionMenu.pack(side= 'left',padx=5, pady=5)
 
-        editOptionMenu = ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Preferences","Undo"], command=self.optionmenu_callback)
+        editOptionMenu = self.obj.ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Preferences","Undo"], command=self.optionmenu_callback)
         editOptionMenu.set("Edit")
         editOptionMenu.pack(side= 'left',padx=5, pady=5)
         
-        toolsOptionMenu = ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Cropping/Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
+        toolsOptionMenu = self.obj.ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Cropping/Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
         toolsOptionMenu.set("Tools")
         toolsOptionMenu.pack(side= 'left',padx=5, pady=5)
 
-        aboutOptionMenu = ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
+        aboutOptionMenu = self.obj.ctk.CTkOptionMenu(master=self.obj.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
         aboutOptionMenu.set("About")
         aboutOptionMenu.pack(side= 'left',padx=5, pady=5)
         
@@ -126,11 +126,11 @@ class MainMenu():
         loading_window.attributes('-topmost', True)
         loading_window.after_idle(loading_window.attributes, '-topmost', False)
         
-        self.loadDataLabel = ctk.CTkLabel(master=loading_window, text = self.loadDataText, justify = "center", font = ("Helvetica", 20))
+        self.loadDataLabel = self.obj.ctk.CTkLabel(master=loading_window, text = self.loadDataText, justify = "center", font = ("Helvetica", 20))
         self.loadDataLabel.pack(side = 'top', expand = True, fill = 'x', pady =(10,0))
         
         # Create a progress bar
-        progress = ctk.CTkProgressBar(loading_window, width = 150, height = 30, mode='indeterminate', orientation='horizontal')
+        progress = self.obj.ctk.CTkProgressBar(loading_window, width = 150, height = 30, mode='indeterminate', orientation='horizontal')
         progress.pack(side = 'top',expand=True, fill='x', padx = 80, pady=(0,80))
         progress.start()
         

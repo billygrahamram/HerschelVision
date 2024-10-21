@@ -22,6 +22,11 @@ class App(ctk.CTk):
         self.start_app = True
         self.ctk = ctk
 
+        self.title(self.default_properties.get("title"))
+        self.geometry(self.default_properties.get("geometry"))
+        self.minsize(self.default_properties.get("min_size"),self.default_properties.get("min_size"))
+        self.resizable(width=True, height=True)
+
         # Empty the img_dir_record.txt file at startup. Opens and closes it, making the file empty.
         with open(img_dir_record_path, 'w') as f:
             pass
