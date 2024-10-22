@@ -36,7 +36,7 @@ class HomeWindow(ctk.CTkFrame):
         
 
         
-        if self.parent.start_app:
+        if self.parent.start_app or self.parent.Dataloaded==False:
             print("first time start")
             
             if ctk.get_appearance_mode() == 'Light': 
@@ -62,7 +62,7 @@ class HomeWindow(ctk.CTkFrame):
                 print("not first time start")
                 self.parent.raw_img_dir = f.read().strip()
                 homeCanvas = ctk.CTkCanvas(self.parent.leftOriginalImgFrame, 
-                        bg = self.parent.rgbValues(self.parent),
+                        bg = self.parent.rgbValues(),
                         bd = 0,
                         highlightthickness=0,
                         relief='ridge')

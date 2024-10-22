@@ -121,3 +121,32 @@ def snv(input_data):
 def normalize(data):
     scaler = MinMaxScaler()
     return scaler.fit_transform(data)
+
+def crop_3d_image(image, top_left, bottom_right):
+    """
+    Crop a 3D numpy image using the coordinates of the top left and bottom right corners.
+
+    Parameters:
+    image (numpy.ndarray): The 3D image to crop.
+    top_left (tuple): The (x, y) coordinates of the top left corner.
+    bottom_right (tuple): The (x, y) coordinates of the bottom right corner.
+
+    Returns:
+    numpy.ndarray: The cropped 3D image.
+    """
+    x1, y1 = top_left
+    x2, y2 = bottom_right
+    z1, z2 = 0, image.shape[2]  # Take the entire range along the z-axis
+    croppedCube = image[y1:y2, x1:x2, z1:z2]
+    return croppedCube
+
+def kmeansSegmentation(array, clusters, bands):
+    overlookBand = int(160)
+    array = array[:, :, overlookBand:(overlookBand + bands)]
+    X = array.reshape(-1, bands)
+    kmeans = KMeans(n_clusters=clusters, n_init=10)
+    kmeans.fit(X)
+    segmented_img = kmeans.cluster_centers_[kmeans.labels_]
+    segmented_img = segmented_img.reshape(array.shape)
+    
+    return segmented_img

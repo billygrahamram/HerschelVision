@@ -55,10 +55,9 @@ class App(ctk.CTk):
         self.mainloop()
 
     def wavelengthsSlider_event(self,value=150):
-        if self.raw_img_dir == None:
+        if self.raw_img_dir == None or self.Dataloaded==False:
             pass
         else:
-    
             value = int(float(value))
             single_band_img = single_band(self.spectral_array, int(value))
             self.tk_image = Image.fromarray(np.uint8(single_band_img))
@@ -87,7 +86,7 @@ class App(ctk.CTk):
 
     
     def band1ScatterSlider_event(self,value=150):
-        if self.raw_img_dir== None:
+        if self.raw_img_dir== None or self.Dataloaded==False:
             pass
         else:
             self.band1ScatterSliderCurrentValueLabel.configure(text = "First Band: " + str(int(value)))
@@ -102,7 +101,7 @@ class App(ctk.CTk):
             self.scatterPlotFigax.figure.canvas.draw()
 
     def band2ScatterSlider_event(self,value=150):
-            if self.raw_img_dir == None:
+            if self.raw_img_dir == None or self.Dataloaded==False:
                 pass
             else:
                 self.band2ScatterSliderCurrentValueLabel.configure(text= "Second Band: " + str(int(value)))
@@ -224,15 +223,17 @@ class App(ctk.CTk):
             rgb = create_pseudo_rgb(self.spectral_array)
             self.tk_image = Image.fromarray(np.uint8(rgb))
 
-            # destroy the left frame for new image
-            for widget in self.leftOriginalImgFrame.winfo_children():
-                widget.destroy()
+            if hasattr(self, 'leftOriginalImgFrame') and self.leftOriginalImgFrame.winfo_exists():
+                # Destroy all children of the left frame safely
+                for widget in self.leftOriginalImgFrame.winfo_children():
+                    if widget.winfo_exists():
+                        widget.destroy()  # Destroy the widget if it exists
             
-            openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
-                            bg = self.rgbValues(),
-                            bd = 0,
-                            highlightthickness = 0,
-                            relief = 'ridge')
-            openCanvas.pack(expand =True, fill='both')        
-            openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
-            openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image))
+                        openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
+                                        bg = self.rgbValues(),
+                                        bd = 0,
+                                        highlightthickness = 0,
+                                        relief = 'ridge')
+                        openCanvas.pack(expand =True, fill='both')        
+                        openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
+                        openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image))

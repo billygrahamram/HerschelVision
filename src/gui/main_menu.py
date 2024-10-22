@@ -5,6 +5,8 @@ from utils.variables_utils import *
 from utils.io_utils import *
 from utils.data_preprocessing_utils import *
 from gui.preprocess import *
+from gui.preferences_window import *
+from gui.cropping_segmentation_window import *
 import customtkinter as ctk
 from gui.home_window import *
 
@@ -28,12 +30,14 @@ class MainMenu(ctk.CTkFrame):
             preprocess_object = Preprocess(self)
             preprocess_object.preprocessingWindow()
         elif choice == 'Preferences':
-            self.preferencesWindow()
+            preference_object = PreferenceWindows(self)
+            preference_object.preferencesWindow()
         elif choice == 'Home':
             hw_object = HomeWindow(self.parent)
             hw_object.home_menu()
         elif choice == 'Cropping/Segmentation':
-            self.croppingWindow()
+            hw_object = CropSegmentWindows(self.parent)
+            hw_object.croppingWindow()
 
     def creat_drop_down_menu(self):
         fileOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Home","New","Open","Save","Export","Exit"], command = self.optionmenu_callback)
@@ -132,6 +136,7 @@ class MainMenu(ctk.CTkFrame):
         loading_window.title("Loading data")
         loading_window.geometry("500x200")
         loading_window.resizable(width=False, height=False)
+        loading_window.update_idletasks()
 
         loading_window.grab_set()
 

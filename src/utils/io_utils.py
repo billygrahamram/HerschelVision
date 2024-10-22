@@ -43,3 +43,18 @@ def readData(raw_img_dir):
     else:
         print(f"Unsupported file type: {file_extension}")
         return None
+    
+def saveDatatoComputer(numpyarray, filename):
+    if filename.endswith('.csv'):
+        # Flatten the array and save it as a CSV
+        # flat_array = numpyarray.flatten()
+        df = pd.DataFrame(numpyarray)
+        df.to_csv(filename, index=False)
+    elif filename.endswith('.npy'):
+        # Save the 3D array as a .npy file
+        np.save(filename, numpyarray)
+    elif filename.endswith('.txt'):
+        # Flatten the array and save it as a txt
+        # flat_array = numpyarray.flatten() # removed this line as it converts 2d array to 1d array
+        df = pd.DataFrame(numpyarray)
+        df.to_csv(filename, sep='\t', index=False)

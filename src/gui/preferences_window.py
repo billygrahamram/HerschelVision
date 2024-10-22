@@ -21,11 +21,11 @@ class PreferenceWindows(ctk.CTkFrame):
         def PreprocessingButton_callback():
             
             def savePreProSetting():
-                self.SGWinSizePrePro = int(ppSGWinSizeEntry.get())
-                self.SGPolyOrderPrePro = int(ppSGPolyOrderEntry.get() )   
+                self.parent.parent.default_properties["SGWinSizePrePro"] = int(ppSGWinSizeEntry.get())
+                self.parent.parent.default_properties["SGPolyOrderPrePro "] = int(ppSGWinSizeEntry.get())  
                 
-                print(f"SG Window Size: {self.SGWinSizePrePro}")
-                print(f"SG Poly Order: {self.SGPolyOrderPrePro}")
+                print(f"SG Window Size: {self.parent.parent.default_properties.get('SGWinSizePrePro')}")
+                print(f"SG Poly Order: {self.parent.parent.default_properties.get('SGPolyOrderPrePro')}")
                 
                 
             # Clear rightFormFrame
@@ -33,17 +33,17 @@ class PreferenceWindows(ctk.CTkFrame):
                 widget.destroy()
             rightPreferenceFormFrame.update()
             
-            PreprocessingForm = ctk.CTkFrame(master = rightPreferenceFormFrame,
+            PreprocessingForm = self.parent.parent.ctk.CTkFrame(master = rightPreferenceFormFrame,
                                              border_width= 1,
                                             )
             PreprocessingForm.pack(side = 'left', fill = 'both', expand = True)
         
 
-            ppSGWinSizeLabel = ctk.CTkLabel(master = PreprocessingForm, text = "Enter Window Size for Savitzky Golay (odd number):  ", anchor = 'w')
-            ppSGWinSizeEntry = ctk.CTkEntry(master = PreprocessingForm, placeholder_text="Enter window size" )
-            ppSGPolyOrderLabel = ctk.CTkLabel(master = PreprocessingForm, text = "Enter Polynomial Order for Savitzky Golay (< Window size):  ", anchor = 'w')
-            ppSGPolyOrderEntry = ctk.CTkEntry(master = PreprocessingForm, placeholder_text="Enter polynomial order" )
-            savePreProSettings = ctk.CTkButton(master=rightBottomApplyButtomFrame, text="Apply", command=savePreProSetting)
+            ppSGWinSizeLabel = self.parent.parent.ctk.CTkLabel(master = PreprocessingForm, text = "Enter Window Size for Savitzky Golay (odd number):  ", anchor = 'w')
+            ppSGWinSizeEntry = self.parent.parent.ctk.CTkEntry(master = PreprocessingForm, placeholder_text="Enter window size" )
+            ppSGPolyOrderLabel = self.parent.parent.ctk.CTkLabel(master = PreprocessingForm, text = "Enter Polynomial Order for Savitzky Golay (< Window size):  ", anchor = 'w')
+            ppSGPolyOrderEntry = self.parent.parent.ctk.CTkEntry(master = PreprocessingForm, placeholder_text="Enter polynomial order" )
+            savePreProSettings = self.parent.parent.ctk.CTkButton(master=rightBottomApplyButtomFrame, text="Apply", command=savePreProSetting)
            
             
             
@@ -60,43 +60,41 @@ class PreferenceWindows(ctk.CTkFrame):
             
             def saveSegmentationSetting():
                   
-                self.KclusterNoSegPrePro = int(segKclusterEntry.get())
-                self.KClusterThresPrePro = int(segThresEntry.get())
-                self.selectedSAMModel = str(segSAMModelOptions.get())
-                self.defaultSegmentationMethod = str(segDefaultMethodOptions.get())
-                
-                print("K-cluster No Seg PrePro: ", self.KclusterNoSegPrePro)
-                print("K-Cluster Thres PrePro: ", self.KClusterThresPrePro)
-                print("Selected SAM Model: ", self.selectedSAMModel)
-                print("Default Segmentation Model PrePro: ", self.defaultSegmentationMethod)
-                
-                
+                self.parent.parent.default_properties["KclusterNoSegPrePro"]  = int(segKclusterEntry.get())
+                self.parent.parent.default_properties["KClusterThresPrePro"] = int(segThresEntry.get())
+                self.parent.parent.default_properties["selectedSAMModel "]  = str(segSAMModelOptions.get())
+                self.parent.parent.default_properties["defaultSegmentationMethod "] = str(segDefaultMethodOptions.get())
 
+                print("K-cluster No Seg PrePro: ", self.parent.parent.default_properties.get('KclusterNoSegPrePro'))
+                print("K-Cluster Thres PrePro: ", self.parent.parent.default_properties.get('KClusterThresPrePro'))
+                print("Selected SAM Model: ", self.parent.parent.default_properties.get('selectedSAMModel'))
+                print("Default Segmentation Model PrePro: ", self.parent.parent.default_properties.get('defaultSegmentationMethod'))
+                
             for widget in rightPreferenceFormFrame.winfo_children():
                 widget.destroy()
             rightPreferenceFormFrame.update()
             
-            SegmentationForm = ctk.CTkFrame(master = rightPreferenceFormFrame,
+            SegmentationForm = self.parent.parent.ctk.CTkFrame(master = rightPreferenceFormFrame,
                                             border_width= 1,
                                             )
             SegmentationForm.pack(side = 'left', fill = 'both', expand = True)
             
-            segDefaultMethodLabel = ctk.CTkLabel(master = SegmentationForm, text = "Default Segmentation Method:  ", anchor='w')
-            segKclusterLabel = ctk.CTkLabel(master = SegmentationForm, text = "Enter the number of clusters for K-means:  ", anchor = 'w')
-            segKclusterEntry = ctk.CTkEntry(master = SegmentationForm, placeholder_text="Enter cluster numbers" )
-            segThresLabel = ctk.CTkLabel(master = SegmentationForm, text = "Enter Segmentation Thresholding value:  ", anchor = 'w')
-            segThresEntry = ctk.CTkEntry(master = SegmentationForm, placeholder_text="Threshold number" )
-            segSAMModelLabel = ctk.CTkLabel(master = SegmentationForm, text = "Select your SAM model:  ", anchor='w')
-            saveSegmentationSettings = ctk.CTkButton(master=rightBottomApplyButtomFrame, text="Apply", command=saveSegmentationSetting)
+            segDefaultMethodLabel = self.parent.parent.ctk.CTkLabel(master = SegmentationForm, text = "Default Segmentation Method:  ", anchor='w')
+            segKclusterLabel = self.parent.parent.ctk.CTkLabel(master = SegmentationForm, text = "Enter the number of clusters for K-means:  ", anchor = 'w')
+            segKclusterEntry = self.parent.parent.ctk.CTkEntry(master = SegmentationForm, placeholder_text="Enter cluster numbers" )
+            segThresLabel = self.parent.parent.ctk.CTkLabel(master = SegmentationForm, text = "Enter Segmentation Thresholding value:  ", anchor = 'w')
+            segThresEntry = self.parent.parent.ctk.CTkEntry(master = SegmentationForm, placeholder_text="Threshold number" )
+            segSAMModelLabel = self.parent.parent.ctk.CTkLabel(master = SegmentationForm, text = "Select your SAM model:  ", anchor='w')
+            saveSegmentationSettings = self.parent.parent.ctk.CTkButton(master=rightBottomApplyButtomFrame, text="Apply", command=saveSegmentationSetting)
             
-            segSAMModelOptions = ctk.CTkOptionMenu(master = SegmentationForm,
+            segSAMModelOptions = self.parent.parent.ctk.CTkOptionMenu(master = SegmentationForm,
                                                     values = ["ViT-H SAM Model", 
                                                             "ViT-L SAM Model", 
                                                             "ViT-B SAM Model"],
                                                     )
             segSAMModelOptions.set("SAM Models")
             
-            segDefaultMethodOptions = ctk.CTkOptionMenu(master = SegmentationForm,
+            segDefaultMethodOptions = self.parent.parent.ctk.CTkOptionMenu(master = SegmentationForm,
                                                     values = ["K means clustering", 
                                                             "SAM Model"],
                                                     )
@@ -117,13 +115,13 @@ class PreferenceWindows(ctk.CTkFrame):
             
             
             def savePseudoRGBSetting():
-                self.RedbandNoPseudoRGB = int(RedbandEntry.get())
-                self.greenBandNoPseudoRGB = int(GreenbandEntry.get())
-                self.blueBandNoPseudoRGB = int(BluebandEntry.get())  
+                self.parent.parent.default_properties["RedbandNoPseudoRGB"] = int(RedbandEntry.get())
+                self.parent.parent.default_properties["greenBandNoPseudoRGB"]= int(GreenbandEntry.get())
+                self.parent.parent.default_properties["blueBandNoPseudoRGB"] = int(BluebandEntry.get())  
                 
-                print(f"Red band number for Pseudo RGB Image: {self.RedbandNoPseudoRGB}")
-                print(f"Green band number for Pseudo RGB Image: {self.greenBandNoPseudoRGB}")
-                print(f"Blue band number for Pseudo RGB Image: {self.blueBandNoPseudoRGB}")
+                print(f"Red band number for Pseudo RGB Image: {self.parent.parent.default_properties.get('RedbandNoPseudoRGB')}")
+                print(f"Green band number for Pseudo RGB Image: {self.parent.parent.default_properties.get('greenBandNoPseudoRGB')}")
+                print(f"Blue band number for Pseudo RGB Image: {self.parent.parent.default_properties.get('blueBandNoPseudoRGB')}")
                 
                 
 
@@ -132,18 +130,18 @@ class PreferenceWindows(ctk.CTkFrame):
 
             rightPreferenceFormFrame.update()
     
-            PseudoRGBFrame = ctk.CTkFrame(master = rightPreferenceFormFrame,
+            PseudoRGBFrame = self.parent.parent.ctk.CTkFrame(master = rightPreferenceFormFrame,
                                             border_width= 1)   
             PseudoRGBFrame.pack(side = 'left', fill = 'both', expand ='true')
             
 
-            RedbandLabel = ctk.CTkLabel(master = PseudoRGBFrame, text = "Enter the Red band number for Pseudo RGB Image:  ", anchor = 'w')
-            RedbandEntry = ctk.CTkEntry(master = PseudoRGBFrame, placeholder_text="Red band number" )
-            GreenbandLabel = ctk.CTkLabel(master = PseudoRGBFrame, text = "Enter the Green band number for Pseudo RGB Image:  ", anchor = 'w')
-            GreenbandEntry = ctk.CTkEntry(master = PseudoRGBFrame, placeholder_text="Green band number" )
-            BluebandLabel = ctk.CTkLabel(master = PseudoRGBFrame, text = "Enter the Blue band number for Pseudo RGB Image:  ", anchor = 'w')
-            BluebandEntry = ctk.CTkEntry(master = PseudoRGBFrame, placeholder_text="Blue band number" )
-            savepseudoRGBSettings = ctk.CTkButton(master=rightBottomApplyButtomFrame, text="Apply", command= savePseudoRGBSetting)
+            RedbandLabel = self.parent.parent.ctk.CTkLabel(master = PseudoRGBFrame, text = "Enter the Red band number for Pseudo RGB Image:  ", anchor = 'w')
+            RedbandEntry = self.parent.parent.ctk.CTkEntry(master = PseudoRGBFrame, placeholder_text="Red band number" )
+            GreenbandLabel = self.parent.parent.ctk.CTkLabel(master = PseudoRGBFrame, text = "Enter the Green band number for Pseudo RGB Image:  ", anchor = 'w')
+            GreenbandEntry = self.parent.parent.ctk.CTkEntry(master = PseudoRGBFrame, placeholder_text="Green band number" )
+            BluebandLabel = self.parent.parent.ctk.CTkLabel(master = PseudoRGBFrame, text = "Enter the Blue band number for Pseudo RGB Image:  ", anchor = 'w')
+            BluebandEntry = self.parent.parent.ctk.CTkEntry(master = PseudoRGBFrame, placeholder_text="Blue band number" )
+            savepseudoRGBSettings = self.parent.parent.ctk.CTkButton(master=rightBottomApplyButtomFrame, text="Apply", command= savePseudoRGBSetting)
             
             
             RedbandLabel.grid(row = 0, column = 0, padx=100, pady=(100,5), sticky = 'ew')
@@ -158,15 +156,15 @@ class PreferenceWindows(ctk.CTkFrame):
             
             
             def saveEMRSetting():
-                self.noOfBandsEMR = int(BandNoEntry.get())
-                self.firstBandEMR = int(FirstbandEntry.get())
-                self.lastBandEMR =  int(LastbandEntry.get())
-                self.spectralResolution = int(SpectralResolutionEntry.get())
+                self.parent.parent.default_properties["noOfBandsEMR"] = int(BandNoEntry.get())
+                self.parent.parent.default_properties["firstBandEMR"] = int(FirstbandEntry.get())
+                self.parent.parent.default_properties["lastBandEMR"] =  int(LastbandEntry.get())
+                self.parent.parent.default_properties["spectralResolution"]= int(SpectralResolutionEntry.get())
                 
-                print(f"No of Band: {self.noOfBandsEMR}\n"
-                    f"First Band: {self.firstBandEMR}\n"
-                    f"Last Band: {self.lastBandEMR}\n"
-                    f"Spectral Resolution: {self.spectralResolution}")
+                print(f"No of Band: {self.parent.parent.default_properties.get('noOfBandsEMR')}\n"
+                    f"First Band: {self.parent.parent.default_properties.get('firstBandEMR')}\n"
+                    f"Last Band: {self.parent.parent.default_properties.get('lastBandEMR')}\n"
+                    f"Spectral Resolution: {self.parent.parent.default_properties.get('spectralResolution')}")
                 
 
             for widget in rightPreferenceFormFrame.winfo_children():
@@ -174,23 +172,23 @@ class PreferenceWindows(ctk.CTkFrame):
 
             rightPreferenceFormFrame.update()
     
-            EMRInfoFrame = ctk.CTkFrame(master = rightPreferenceFormFrame,
+            EMRInfoFrame = self.parent.parent.ctk.CTkFrame(master = rightPreferenceFormFrame,
                                             border_width= 1)   
             EMRInfoFrame.pack(side = 'left', fill = 'both', expand ='true')
             
-            BandNoLabel = ctk.CTkLabel(master = EMRInfoFrame, text = "Enter the number of bands in your dataset:  ", anchor = 'w')
-            BandNoEntry = ctk.CTkEntry(master = EMRInfoFrame, placeholder_text="Total number of bands" )
+            BandNoLabel = self.parent.parent.ctk.CTkLabel(master = EMRInfoFrame, text = "Enter the number of bands in your dataset:  ", anchor = 'w')
+            BandNoEntry = self.parent.parent.ctk.CTkEntry(master = EMRInfoFrame, placeholder_text="Total number of bands" )
             
-            FirstbandLabel = ctk.CTkLabel(master = EMRInfoFrame, text = "Enter the first wavelength of range in nm:  ", anchor = 'w')
-            FirstbandEntry = ctk.CTkEntry(master = EMRInfoFrame, placeholder_text="First nanometer" )
+            FirstbandLabel = self.parent.parent.ctk.CTkLabel(master = EMRInfoFrame, text = "Enter the first wavelength of range in nm:  ", anchor = 'w')
+            FirstbandEntry = self.parent.parent.ctk.CTkEntry(master = EMRInfoFrame, placeholder_text="First nanometer" )
             
-            LastbandLabel = ctk.CTkLabel(master = EMRInfoFrame, text = "Enter the last wavelength of range in nm:  ", anchor = 'w')
-            LastbandEntry = ctk.CTkEntry(master = EMRInfoFrame, placeholder_text="Last nanometer" )
+            LastbandLabel = self.parent.parent.ctk.CTkLabel(master = EMRInfoFrame, text = "Enter the last wavelength of range in nm:  ", anchor = 'w')
+            LastbandEntry = self.parent.parent.ctk.CTkEntry(master = EMRInfoFrame, placeholder_text="Last nanometer" )
             
-            SpectralResolutionLabel = ctk.CTkLabel(master = EMRInfoFrame, text = "Enter the spectral resolution of your sensor:  ", anchor = 'w')
-            SpectralResolutionEntry = ctk.CTkEntry(master = EMRInfoFrame, placeholder_text="Spectral Resolution" )
+            SpectralResolutionLabel = self.parent.parent.ctk.CTkLabel(master = EMRInfoFrame, text = "Enter the spectral resolution of your sensor:  ", anchor = 'w')
+            SpectralResolutionEntry = self.parent.parent.ctk.CTkEntry(master = EMRInfoFrame, placeholder_text="Spectral Resolution" )
             
-            saveEMRSettings = ctk.CTkButton(master=rightBottomApplyButtomFrame, text="Apply", command=saveEMRSetting)
+            saveEMRSettings = self.parent.parent.ctk.CTkButton(master=rightBottomApplyButtomFrame, text="Apply", command=saveEMRSetting)
             
             BandNoLabel.grid(row = 0, column = 0, padx=100, pady=(100,5), sticky = 'ew')
             BandNoEntry.grid(row = 0, column = 1,padx=100, pady=(100,5),sticky = 'ew')
@@ -202,12 +200,12 @@ class PreferenceWindows(ctk.CTkFrame):
             SpectralResolutionEntry.grid(row = 3, column = 1,padx=100, pady=5,sticky = 'ew')
             saveEMRSettings.grid(row=0, column = 1, padx=5, pady=5, sticky = 'ew')
 
-        for widget in self.workAreaFrame.winfo_children():
+        for widget in self.parent.parent.workAreaFrame.winfo_children():
             widget.destroy()
             
-        leftPreferenceButtonsFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        rightPreferenceFormFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        rightBottomApplyButtomFrame = ctk.CTkFrame(master = self.workAreaFrame)
+        leftPreferenceButtonsFrame = self.parent.parent.ctk.CTkFrame(master = self.parent.parent.workAreaFrame)
+        rightPreferenceFormFrame = self.parent.parent.ctk.CTkFrame(master = self.parent.parent.workAreaFrame)
+        rightBottomApplyButtomFrame = self.parent.parent.ctk.CTkFrame(master = self.parent.parent.workAreaFrame)
         
         leftPreferenceButtonsFrame.place(x = 0, y = 0, relwidth = 0.2, relheight = 1)
         rightPreferenceFormFrame.place(relx = 0.2, y = 0, relwidth = 0.8, relheight = 0.9)
@@ -218,10 +216,10 @@ class PreferenceWindows(ctk.CTkFrame):
         
         PreprocessingButton_callback()
         
-        PreprocessingButton = ctk.CTkButton(master=leftPreferenceButtonsFrame, text="Preprocessing", command=PreprocessingButton_callback)
-        SegmentationButton = ctk.CTkButton(master=leftPreferenceButtonsFrame, text="Segmentation", command=SegmentationButton_callback)
-        RGBButton = ctk.CTkButton(master=leftPreferenceButtonsFrame, text="RGB Bands", command=RGBButton_callback)
-        EMRButton = ctk.CTkButton(master=leftPreferenceButtonsFrame, text="Wavelengths", command=EMRButton_callback)
+        PreprocessingButton = self.parent.parent.ctk.CTkButton(master=leftPreferenceButtonsFrame, text="Preprocessing", command=PreprocessingButton_callback)
+        SegmentationButton = self.parent.parent.ctk.CTkButton(master=leftPreferenceButtonsFrame, text="Segmentation", command=SegmentationButton_callback)
+        RGBButton = self.parent.parent.ctk.CTkButton(master=leftPreferenceButtonsFrame, text="RGB Bands", command=RGBButton_callback)
+        EMRButton = self.parent.parent.ctk.CTkButton(master=leftPreferenceButtonsFrame, text="Wavelengths", command=EMRButton_callback)
         
         
         rightBottomApplyButtomFrame.columnconfigure((0,1,2), weight = 1)

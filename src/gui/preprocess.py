@@ -213,7 +213,7 @@ class Preprocess(ctk.CTkFrame):
         selected_rows = spectral_array[indices]
         self.preProcessedPlotFigax.clear()
         for i, row in enumerate(selected_rows):
-            self.preProcessedPlotFigax.plot(np.arange(0, self.noOfBandsEMR), row, label=f'Row {indices[i]}')
+            self.preProcessedPlotFigax.plot(np.arange(0, self.parent.parent.default_properties.get('noOfBandsEMR')), row, label=f'Row {indices[i]}')
         self.preProcessedPlotFigax.set_title("Preprocessed Signature",fontsize =40)
         self.preProcessedPlotFigax.set_xlabel("Wavelength",fontsize =40)
         self.preProcessedPlotFigax.set_ylabel("Reflectance",fontsize =40)

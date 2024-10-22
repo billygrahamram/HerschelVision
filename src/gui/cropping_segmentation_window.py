@@ -17,7 +17,6 @@ class CropSegmentWindows(ctk.CTkFrame):
 
     def croppingWindow(self):
         
-        
         def cropped_getresizedImageCoordinates(event, canvas, tk_image, resized_tk):
     
             print("cropped get resized image coordinates........")
@@ -45,10 +44,7 @@ class CropSegmentWindows(ctk.CTkFrame):
                     scaled_imgY = round(imgY * y_scale_ratio)
                     print("this is test of generateFinalSegmentedImage")
                     generateFinalSegmentedImage(segmented_img = tk_image, x = scaled_imgX, y = scaled_imgY)
-                    
-                    
-                    
-            
+                
             elif border_y == 0:
                 if x <= int(border_x):
                     pass
@@ -90,11 +86,7 @@ class CropSegmentWindows(ctk.CTkFrame):
             
             croppedImgcroppingCanvas.pack(expand = True, fill='both')
             croppedImgcroppingCanvas.bind('<Configure>',lambda event: cropped_full_image(event, extracted_point_img, canvas=croppedImgcroppingCanvas))
-            
-            
-            
-            
-        
+
         def cropped_full_image(event, tk_image, canvas):
             print("cropped full image ........")
             # this function takes in a image and calculates it's dimension and the window dimension
@@ -236,7 +228,7 @@ class CropSegmentWindows(ctk.CTkFrame):
             if self.saveFile is not None:
                 self.loadDataText = f'Saving cropped data (unfolded) ...'
                 threading.Thread(target = setUnfoldedDataloader).start()
-                self.dataLoadingScreen()
+                self.parent.dataLoadingScreen()
                 self.saveFile.close()
             
         def setUnfoldedDataloader():
@@ -244,12 +236,12 @@ class CropSegmentWindows(ctk.CTkFrame):
             dataToSave = crop_3d_image(self.spectral_array,(self.scaled_imgX, self.scaled_imgY), (self.scaled_imgX1, self.scaled_imgY1))
             dataToSave = unfold(dataToSave)
             saveDatatoComputer(dataToSave, self.saveFile.name)
-            self.Dataloaded = True
+            self.parent.parent.Dataloaded = True
             
             
         def saveSegmentedImage():
             print("save segmented image........")
-            self.Dataloaded = False
+            self.parent.parent.Dataloaded = False
             
             self.saveFile = tk.filedialog.asksaveasfile(defaultextension = '.npy',
                                                 filetypes = [("Numpy Array", "*.npy"),
@@ -258,7 +250,7 @@ class CropSegmentWindows(ctk.CTkFrame):
             if self.saveFile is not None:
                 self.loadDataText = f'Saving Segmented data (x,y,z) ...'
                 threading.Thread(target = saveSegmentedDataloader).start()
-                self.dataLoadingScreen()
+                self.parent.dataLoadingScreen()
                 self.saveFile.close()
                 
                 
@@ -272,17 +264,14 @@ class CropSegmentWindows(ctk.CTkFrame):
             print("Shape of data after applying mask:", dataToSave.shape)  
             saveDatatoComputer(dataToSave, self.saveFile.name)
             print("Data saved to:", self.saveFile.name)
-            self.Dataloaded = True
+            self.parent.parent.Dataloaded = True
             print("Dataloaded set to True")
-            
-            
-
             
             
         def saveUnfoldedSegmentedImage():
             
             print("save unfolded segmented image........")
-            self.Dataloaded = False
+            self.parent.parent.Dataloaded = False
             
             self.saveFile = tk.filedialog.asksaveasfile(defaultextension = '.npy',
                                                 filetypes = [("Numpy Array", "*.npy"),
@@ -300,7 +289,7 @@ class CropSegmentWindows(ctk.CTkFrame):
             dataToSave = np.where(self.mask[..., None], dataToSave, 0)
             dataToSave = unfold(dataToSave)
             saveDatatoComputer(dataToSave, self.saveFile.name)
-            self.Dataloaded = True
+            self.parent.parent.Dataloaded = True
             
             
         def applySegmentation():
