@@ -79,7 +79,7 @@ class CropSegmentWindows(ctk.CTkFrame):
                 widget.destroy()
                 
             croppedImgcroppingCanvas = ctk.CTkCanvas(rightCroppedImageFrame,
-                bg = self.rgbValues(),
+                bg = self.parent.rgbValues(),
                 bd =0,
                 highlightthickness=0,
                 relief='ridge')
@@ -152,16 +152,16 @@ class CropSegmentWindows(ctk.CTkFrame):
             x, y = xypos[0]
             x1, y1 = xypos[-1]
             
-            border_x = (canvas.winfo_width() - self.resized_tk.width()) / 2
-            border_y = (canvas.winfo_height() - self.resized_tk.height()) / 2
+            border_x = (canvas.winfo_width() - self.parent.resized_tk.width()) / 2
+            border_y = (canvas.winfo_height() - self.parent.resized_tk.height()) / 2
 
             imgX = x-int(border_x)
             imgY = y-int(border_y)
             imgX1 = x1-int(border_x)
             imgY1 = y1-int(border_y)
             
-            x_scale_ratio = image.width / self.resized_tk.width()
-            y_scale_ratio = image.height / self.resized_tk.height()
+            x_scale_ratio = image.width / self.parent.resized_tk.width()
+            y_scale_ratio = image.height / self.parent.resized_tk.height()
             
             self.scaled_imgX = round(imgX * x_scale_ratio)
             self.scaled_imgY = round(imgY * y_scale_ratio)
@@ -175,7 +175,7 @@ class CropSegmentWindows(ctk.CTkFrame):
         def display_cropped_image(event):
             print("display cropped image........")
             # Crop the image
-            croppedImg = getCroppedimage(oriImgcroppingCanvas, self.tk_image, xypos)
+            croppedImg = getCroppedimage(oriImgcroppingCanvas, self.parent.tk_image, xypos)
             
             xypos.clear()
             
@@ -185,7 +185,7 @@ class CropSegmentWindows(ctk.CTkFrame):
                 widget.destroy()
                 
             croppedImgcroppingCanvas = ctk.CTkCanvas(rightCroppedImageFrame,
-                bg = self.rgbValues(),
+                bg = self.parent.rgbValues(),
                 bd =0,
                 highlightthickness=0,
                 relief='ridge')
@@ -197,7 +197,7 @@ class CropSegmentWindows(ctk.CTkFrame):
     
         def savecroppedImage():
             print("save cropped image........")
-            self.Dataloaded = False
+            self.parent.Dataloaded = False
             
             self.saveFile = tk.filedialog.asksaveasfile(defaultextension = '.npy',
                                                 filetypes = [("Numpy Array", "*.npy"),
@@ -206,19 +206,19 @@ class CropSegmentWindows(ctk.CTkFrame):
             if self.saveFile is not None:
                 self.loadDataText = f'Saving cropped data ...'
                 threading.Thread(target = savecroppedimageDataloader).start()
-                self.dataLoadingScreen()
+                self.parent.parent.dataLoadingScreen()
                 self.saveFile.close()
             
         def savecroppedimageDataloader():
             print("save cropped image data loader........")
-            dataToSave = crop_3d_image(self.spectral_array,(self.scaled_imgX, self.scaled_imgY), (self.scaled_imgX1, self.scaled_imgY1))
+            dataToSave = crop_3d_image(self.parent.spectral_array,(self.scaled_imgX, self.scaled_imgY), (self.scaled_imgX1, self.scaled_imgY1))
             saveDatatoComputer(dataToSave, self.saveFile.name)
-            self.Dataloaded = True
+            self.parent.Dataloaded = True
         
         
         def saveUnfoldedcroppedImage():
             print("save unfolded cropped image........")
-            self.Dataloaded = False
+            self.parent.Dataloaded = False
             
             self.saveFile = tk.filedialog.asksaveasfile(defaultextension = '.npy',
                                                 filetypes = [("Comma Separated Values", "*.csv"),
@@ -236,12 +236,12 @@ class CropSegmentWindows(ctk.CTkFrame):
             dataToSave = crop_3d_image(self.spectral_array,(self.scaled_imgX, self.scaled_imgY), (self.scaled_imgX1, self.scaled_imgY1))
             dataToSave = unfold(dataToSave)
             saveDatatoComputer(dataToSave, self.saveFile.name)
-            self.parent.parent.Dataloaded = True
+            self.parent.Dataloaded = True
             
             
         def saveSegmentedImage():
             print("save segmented image........")
-            self.parent.parent.Dataloaded = False
+            self.parent.Dataloaded = False
             
             self.saveFile = tk.filedialog.asksaveasfile(defaultextension = '.npy',
                                                 filetypes = [("Numpy Array", "*.npy"),
@@ -271,7 +271,7 @@ class CropSegmentWindows(ctk.CTkFrame):
         def saveUnfoldedSegmentedImage():
             
             print("save unfolded segmented image........")
-            self.parent.parent.Dataloaded = False
+            self.parent.Dataloaded = False
             
             self.saveFile = tk.filedialog.asksaveasfile(defaultextension = '.npy',
                                                 filetypes = [("Numpy Array", "*.npy"),
@@ -289,7 +289,7 @@ class CropSegmentWindows(ctk.CTkFrame):
             dataToSave = np.where(self.mask[..., None], dataToSave, 0)
             dataToSave = unfold(dataToSave)
             saveDatatoComputer(dataToSave, self.saveFile.name)
-            self.parent.parent.Dataloaded = True
+            self.parent.Dataloaded = True
             
             
         def applySegmentation():
@@ -303,10 +303,10 @@ class CropSegmentWindows(ctk.CTkFrame):
             for widget in rightCroppedImageFrame.winfo_children():
                     widget.destroy()
                     
-            if self.defaultSegmentationMethod == "K means clustering":
+            if self.parent.default_properties.get('defaultSegmentationMethod') == "K means clustering":
                 
                 segmentedImg = kmeansSegmentation(array= croppedImg, 
-                                                  clusters = self.KclusterNoSegPrePro, 
+                                                  clusters = self.parent.default_properties.get('KclusterNoSegPrePro'), 
                                                   bands = 3)
                 
                 # Rescale to 0-255
@@ -319,7 +319,7 @@ class CropSegmentWindows(ctk.CTkFrame):
   
 
                 croppedImgcroppingCanvas = ctk.CTkCanvas(rightCroppedImageFrame,
-                    bg = self.rgbValues(),
+                    bg = self.parent.rgbValues(),
                     bd = 0,
                     highlightthickness=0,
                     relief='ridge')
@@ -328,7 +328,7 @@ class CropSegmentWindows(ctk.CTkFrame):
                 croppedImgcroppingCanvas.bind('<1>', lambda event: cropped_getresizedImageCoordinates(event, canvas = croppedImgcroppingCanvas, tk_image = segmentedtk_image,resized_tk= getResizedCanvasImage(tk_image=segmentedtk_image,canvas =croppedImgcroppingCanvas)))
 
                 
-            elif self.defaultSegmentationMethod == "SAM Model":
+            elif self.parent.default_properties.get('defaultSegmentationMethod') == "SAM Model":
                 pass
 
         # Clear self.workAreaFrame
