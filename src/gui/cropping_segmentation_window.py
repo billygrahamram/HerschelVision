@@ -298,7 +298,7 @@ class CropSegmentWindows(ctk.CTkFrame):
             # self.KClusterThresPrePro = 2
             # self.selectedSAMModel = 'ViT-B SAM Model'
             # self.defaultSegmentationMethod = 'K means clustering'
-            croppedImg = crop_3d_image(self.spectral_array,(self.scaled_imgX, self.scaled_imgY), (self.scaled_imgX1, self.scaled_imgY1))
+            croppedImg = crop_3d_image(self.parent.spectral_array,(self.scaled_imgX, self.scaled_imgY), (self.scaled_imgX1, self.scaled_imgY1))
             
             for widget in rightCroppedImageFrame.winfo_children():
                     widget.destroy()
@@ -330,29 +330,24 @@ class CropSegmentWindows(ctk.CTkFrame):
                 
             elif self.defaultSegmentationMethod == "SAM Model":
                 pass
-            
-        
-        
-        
-        
 
         # Clear self.workAreaFrame
-        for widget in self.workAreaFrame.winfo_children():
+        for widget in self.parent.workAreaFrame.winfo_children():
             widget.destroy()
 
         
         ## children to workMenuFrame 
-        leftOriginalImageFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        rightCroppedImageFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        leftBottomButtonCroppingFrame = ctk.CTkFrame(master = self.workAreaFrame)
-        righBottomButtonCroppingFrame = ctk.CTkFrame(master = self.workAreaFrame)
+        leftOriginalImageFrame = ctk.CTkFrame(master = self.parent.workAreaFrame)
+        rightCroppedImageFrame = ctk.CTkFrame(master = self.parent.workAreaFrame)
+        leftBottomButtonCroppingFrame = ctk.CTkFrame(master = self.parent.workAreaFrame)
+        righBottomButtonCroppingFrame = ctk.CTkFrame(master = self.parent.workAreaFrame)
         
         leftOriginalImageFrame.place(x = 0, y = 0, relwidth = 0.5, relheight = 0.9)
         rightCroppedImageFrame.place(relx = 0.5, y = 0, relwidth = 0.5, relheight = 0.9)
         leftBottomButtonCroppingFrame.place(rely = 0.9, x=0, relwidth = 0.5, relheight = 0.1)
         righBottomButtonCroppingFrame.place(rely = 0.9, relx=0.5, relwidth = 0.5, relheight = 0.1)
-    
-    
+
+
         leftBottomButtonCroppingFrame.columnconfigure((0,1,2,3), weight = 1)
         leftBottomButtonCroppingFrame.rowconfigure((0,1), weight = 1)
         righBottomButtonCroppingFrame.columnconfigure((0,1,2,3), weight = 1)
@@ -392,9 +387,9 @@ class CropSegmentWindows(ctk.CTkFrame):
 
         
         
-      
-   
-        if self.raw_img_dir == None:
+        
+
+        if self.parent.raw_img_dir == None:
             pass
         else:
             for widget in leftOriginalImageFrame.winfo_children():
@@ -402,14 +397,14 @@ class CropSegmentWindows(ctk.CTkFrame):
             xypos = []
             
             oriImgcroppingCanvas = ctk.CTkCanvas(leftOriginalImageFrame,
-                            bg = self.rgbValues(),
+                            bg = self.parent.rgbValues(),
                             bd =0,
                             highlightthickness=0,
                             relief='ridge')
         
             
             oriImgcroppingCanvas.pack(expand =True, fill='both')
-            oriImgcroppingCanvas.bind('<Configure>',lambda event: self.full_image(event, tk_image= self.tk_image, canvas=oriImgcroppingCanvas))
+            oriImgcroppingCanvas.bind('<Configure>',lambda event: self.parent.full_image(event, tk_image= self.parent.tk_image, canvas=oriImgcroppingCanvas))
             oriImgcroppingCanvas.bind("<B1-Motion>", callback)
             oriImgcroppingCanvas.bind("<ButtonRelease-1>", display_cropped_image)
 
