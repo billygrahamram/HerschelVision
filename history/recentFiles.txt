@@ -1,5 +1,5 @@
-/Users/billygrahamram/Downloads/herschelvisionData/FX17_Fire_Susceptible_14_2022-09-07_16-00-25/capture/FX17_Fire_Susceptible_14_2022-09-07_16-00-25.raw
-/Users/billygrahamram/Downloads/testsimage.npy
+/Users/billygrahamram/Downloads/Campus_data/s_009/capture/s_009.raw
+/Users/billygrahamram/Downloads/segmentedcube.npy
 /Users/billygrahamram/Downloads/herschelvisionData/FX10_Ragweed_S_2022-08-24_17-54-29/capture/FX10_Ragweed_S_2022-08-24_17-54-29.raw
 /Users/billygrahamram/Downloads/herschelvisionData/FX10_Day1_Kochia_S_4_2_withoutBG.npy
-/Users/billygrahamram/Downloads/waterhempPlotting.npy
+/Volumes/NO NAME/SPECIM IQ/t_029/capture/t_029.raw
