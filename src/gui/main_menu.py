@@ -1,14 +1,17 @@
 import os
-import tkinter as tk
 import threading
-from utils.variables_utils import *
-from utils.io_utils import *
-from utils.data_preprocessing_utils import *
-from gui.preprocess import *
-from gui.preferences_window import *
-from gui.cropping_segmentation_window import *
+import tkinter as tk
+
 import customtkinter as ctk
+
+from gui.cropping_segmentation_window import *
 from gui.home_window import *
+from gui.preferences_window import *
+from gui.preprocess import *
+from utils.data_preprocessing_utils import *
+from utils.io_utils import *
+from utils.variables_utils import *
+
 
 class MainMenu(ctk.CTkFrame):
     def __init__(self,parent):

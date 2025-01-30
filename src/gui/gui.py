@@ -7,13 +7,15 @@
 ## This code solely belongs to Billy G. Ram and is currently NOT open sourced. 
 #####################################################################################
 
+from tkinter import messagebox
+
 import customtkinter as ctk
-from utils.config_parser import *
-from utils.variables_utils import *
-from utils.data_preprocessing_utils import *
+
+from gui.home_window import HomeWindow
 from gui.main_menu import MainMenu  # Import the MainMenu subclass
-from gui.home_window import HomeWindow 
-from tkinter import  messagebox
+from utils.config_parser import *
+from utils.data_preprocessing_utils import *
+from utils.variables_utils import *
 
 
 class App(ctk.CTk):

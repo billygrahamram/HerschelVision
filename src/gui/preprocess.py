@@ -1,13 +1,15 @@
 import os
-import tkinter as tk
 import threading
-from utils.variables_utils import *
-from utils.io_utils import *
-from utils.data_preprocessing_utils import *
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.pyplot as plt
+import tkinter as tk
+from tkinter import messagebox
+
 import customtkinter as ctk
-from tkinter import  messagebox
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+from utils.data_preprocessing_utils import *
+from utils.io_utils import *
+from utils.variables_utils import *
 
 
 class Preprocess(ctk.CTkFrame):

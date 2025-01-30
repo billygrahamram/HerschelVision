@@ -1,8 +1,9 @@
-from utils.variables_utils import *
-from PIL import Image
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.pyplot as plt
 import customtkinter as ctk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from PIL import Image
+
+from utils.variables_utils import *
 
 
 class HomeWindow(ctk.CTkFrame):

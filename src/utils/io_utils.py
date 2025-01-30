@@ -1,13 +1,15 @@
-from plantcv import plantcv as pcv
+import glob
+import os
+
+import cv2
 import numpy as np
 import pandas as pd
-from sklearn.cluster import KMeans
-from scipy.signal import savgol_filter
-from sklearn.preprocessing import MinMaxScaler
 from PIL import Image, ImageTk
-import cv2
-import os
-import glob
+from plantcv import plantcv as pcv
+from scipy.signal import savgol_filter
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import MinMaxScaler
+
 
 def readData(raw_img_dir):
     # Get the file extension
