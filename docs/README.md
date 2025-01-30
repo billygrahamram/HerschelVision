@@ -10,7 +10,7 @@ It is recommend to set up a virtual environment for installing HerschelVision (H
 ### Installation steps
 
 1. In the terminal paste the following command to download the HV repository locally.
-    > git source https://github.com/billygrahamram/Herschel-Vision-Hyperspectral-Image-Processing.git
+    > git source https://github.com/billygrahamram/HerschelVision.git
 2. Create a virtual environement.
     > python -m venv .venv
 3. Activate the virtual environment.
