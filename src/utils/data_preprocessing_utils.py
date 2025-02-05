@@ -11,7 +11,7 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler
 
 
-def applybinning(raw_data, value):
+def apply_binning(raw_data, value):
     print(raw_data.shape[-1])
     if raw_data.shape[-1]!=224:
         array = raw_data
@@ -36,7 +36,7 @@ def create_pseudo_rgb(data_ref_array):
 
     return rgb_image
 
-def scatterPlotData(raw_img_dir):
+def scatter_plot_data(raw_img_dir):
     
     _, file_extension = os.path.splitext(raw_img_dir)
 
@@ -44,16 +44,16 @@ def scatterPlotData(raw_img_dir):
         # reads the data and returns a 3 D numpy array
         spectral_array = pcv.readimage(raw_img_dir, mode = 'envi')
         spectral_array_data = spectral_array.array_data 
-        unfoldedData = unfold(spectral_array_data)
-        unfoldedData = unfoldedData[:500,:]
+        unfolded_data = unfold(spectral_array_data)
+        unfolded_data = unfolded_data[:500,:]
         # Create a KMeans instance with 2 clusters (since you have two types of spectral signatures)
         kmeans = KMeans(n_clusters=2, random_state=0, n_init=10)
         # Fit the model to your data
-        kmeans.fit(unfoldedData)
+        kmeans.fit(unfolded_data)
         # The labels_ attribute holds the cluster labels for each data point
         labels = kmeans.labels_
 
-        return labels, unfoldedData
+        return labels, unfolded_data
 
     elif file_extension == '.npy':
         # Load the .npy file
@@ -91,22 +91,22 @@ def preprocessing(selection, data, w, p):
     
     print(data.shape)
     if selection == "Standard Normal Variate":
-        snvData = snv(data)
-        return snvData
+        snv_data = snv(data)
+        return snv_data
         
     elif selection == "Savitzky-Golay (first)":
  
-        sgoneData= savgol_filter(data, window_length=w, polyorder = p, deriv=1)
-        return sgoneData
+        sgone_data= savgol_filter(data, window_length=w, polyorder = p, deriv=1)
+        return sgone_data
        
     elif selection == "Savitzky-Golay (second)":
    
-        sgtwoData = savgol_filter(data, window_length=w, polyorder = p, deriv=2)
-        return sgtwoData
+        sgtwo_data = savgol_filter(data, window_length=w, polyorder = p, deriv=2)
+        return sgtwo_data
         
     elif selection == "Normalization":
-        normalizedData = normalize(data)
-        return normalizedData
+        normalized_data = normalize(data)
+        return normalized_data
     elif selection == "None (pass)":
         return data
     
@@ -138,10 +138,10 @@ def crop_3d_image(image, top_left, bottom_right):
     x1, y1 = top_left
     x2, y2 = bottom_right
     z1, z2 = 0, image.shape[2]  # Take the entire range along the z-axis
-    croppedCube = image[y1:y2, x1:x2, z1:z2]
-    return croppedCube
+    cropped_cube = image[y1:y2, x1:x2, z1:z2]
+    return cropped_cube
 
-def kmeansSegmentation(array, clusters, bands):
+def kmeans_segmentation(array, clusters, bands):
     overlookBand = int(160)
     array = array[:, :, overlookBand:(overlookBand + bands)]
     X = array.reshape(-1, bands)

@@ -13,12 +13,12 @@ from utils.io_utils import *
 from utils.variables_utils import *
 
 
-class MainMenu(ctk.CTkFrame):
+class Main_menu(ctk.CTkFrame):
     def __init__(self,parent):
          super().__init__(parent)
          self.parent = parent
          self.app = parent
-         self.unfoldedData = None
+         self.unfolded_data = None
          self.creat_drop_down_menu()
          
     def optionmenu_callback(self,choice):
@@ -31,35 +31,35 @@ class MainMenu(ctk.CTkFrame):
             self.about()
         elif choice == 'Preprocessing':
             preprocess_object = Preprocess(self)
-            preprocess_object.preprocessingWindow()
+            preprocess_object.preprocessing_window()
         elif choice == 'Preferences':
-            preference_object = PreferenceWindows(self)
-            preference_object.preferencesWindow()
+            preference_object = Preference_windows(self)
+            preference_object.preferences_window()
         elif choice == 'Home':
-            hw_object = HomeWindow(self.parent)
+            hw_object = Home_window(self.parent)
             hw_object.home_menu()
         elif choice == 'Cropping/Segmentation':
-            hw_object = CropSegmentWindows(self.parent)
-            hw_object.croppingWindow()
+            hw_object = Crop_segment_windows(self.parent)
+            hw_object.cropping_window()
 
     def creat_drop_down_menu(self):
-        fileOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Home","New","Open","Save","Export","Exit"], command = self.optionmenu_callback)
-        fileOptionMenu.set("File")
-        fileOptionMenu.pack(side= 'left',padx=5, pady=5)
+        file_option_menu = self.parent.ctk.CTkOptionMenu(master=self.parent.menu_bar_frame, values=["Home","New","Open","Save","Export","Exit"], command = self.optionmenu_callback)
+        file_option_menu.set("File")
+        file_option_menu.pack(side= 'left',padx=5, pady=5)
 
-        editOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Preferences","Undo"], command=self.optionmenu_callback)
-        editOptionMenu.set("Edit")
-        editOptionMenu.pack(side= 'left',padx=5, pady=5)
+        edit_option_menu = self.parent.ctk.CTkOptionMenu(master=self.parent.menu_bar_frame, values=["Preferences","Undo"], command=self.optionmenu_callback)
+        edit_option_menu.set("Edit")
+        edit_option_menu.pack(side= 'left',padx=5, pady=5)
         
-        toolsOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Cropping/Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
-        toolsOptionMenu.set("Tools")
-        toolsOptionMenu.pack(side= 'left',padx=5, pady=5)
+        tools_option_menu = self.parent.ctk.CTkOptionMenu(master=self.parent.menu_bar_frame, values=["Cropping/Segmentation","Preprocessing", "Preferences"], command=self.optionmenu_callback)
+        tools_option_menu.set("Tools")
+        tools_option_menu.pack(side= 'left',padx=5, pady=5)
 
-        aboutOptionMenu = self.parent.ctk.CTkOptionMenu(master=self.parent.menuBarFrame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
-        aboutOptionMenu.set("About")
-        aboutOptionMenu.pack(side= 'left',padx=5, pady=5)
+        about_option_menu = self.parent.ctk.CTkOptionMenu(master=self.parent.menu_bar_frame, values=["Updates","Version","About","References", "Contact us"], command=self.optionmenu_callback)
+        about_option_menu.set("About")
+        about_option_menu.pack(side= 'left',padx=5, pady=5)
 
-        show_image_button = self.parent.ctk.CTkButton(self.parent.menuBarFrame, text="Show RGB Image", command=self.parent.show_psuedo_rgb)
+        show_image_button = self.parent.ctk.CTkButton(self.parent.menu_bar_frame, text="Show RGB Image", command=self.parent.show_psuedo_rgb)
         show_image_button.pack(side='left', padx=5, pady=5)
         
     def open(self):
@@ -114,26 +114,26 @@ class MainMenu(ctk.CTkFrame):
         #using multithreading to show the loading dialog box while data is loading
         threading.Thread(target = self.loadData).start()
         
-        self.dataLoadingScreen()
+        self.data_loading_screen()
 
     def loadData(self):
-        self.loadDataText = 'Opening files...'
-        self.currentData = readData(self.parent.raw_img_dir)
-        self.spectral_array = self.currentData
-        self.spectral_array = applybinning(self.spectral_array,2)
+        self.load_data_text = 'Opening files...'
+        self.current_data = read_data(self.parent.raw_img_dir)
+        self.spectral_array = self.current_data
+        self.spectral_array = apply_binning(self.spectral_array,2)
         self.parent.spectral_array = self.spectral_array
         self.parent.rgb_data = create_pseudo_rgb(self.spectral_array)
-        self.loadDataText = 'Loading data and creating plots...'
-        self.parent.kmeanslabels, self.parent.kmeansData = scatterPlotData(self.parent.raw_img_dir)
-        self.loadDataText = 'Unfolding data...'
-        self.unfoldedData = unfold(self.spectral_array)
-        self.loadDataText = 'Finishing up...'
-        #self.parent.wavelengthsSlider_event()
+        self.load_data_text = 'Loading data and creating plots...'
+        self.parent.kmeanslabels, self.parent.kmeansData = scatter_plot_data(self.parent.raw_img_dir)
+        self.load_data_text = 'Unfolding data...'
+        self.unfolded_data = unfold(self.spectral_array)
+        self.load_data_text = 'Finishing up...'
+        #self.parent.wavelengths_slider_event()
         self.parent.show_psuedo_rgb()
         self.parent.Dataloaded = True
         print("end")
 
-    def dataLoadingScreen(self):
+    def data_loading_screen(self):
         loading_window = tk.Toplevel(self.parent)
         loading_window.transient(self.parent) 
         loading_window.title("Loading data")
@@ -146,8 +146,8 @@ class MainMenu(ctk.CTkFrame):
         loading_window.attributes('-topmost', True)
         loading_window.after_idle(loading_window.attributes, '-topmost', False)
         
-        self.loadDataLabel = self.parent.ctk.CTkLabel(master=loading_window, text = self.loadDataText, justify = "center", font = ("Helvetica", 20))
-        self.loadDataLabel.pack(side = 'top', expand = True, fill = 'x', pady =(10,0))
+        self.load_data_label = self.parent.ctk.CTkLabel(master=loading_window, text = self.load_data_text, justify = "center", font = ("Helvetica", 20))
+        self.load_data_label.pack(side = 'top', expand = True, fill = 'x', pady =(10,0))
         
         # Create a progress bar
         progress = self.parent.ctk.CTkProgressBar(loading_window, width = 150, height = 30, mode='indeterminate', orientation='horizontal')
@@ -159,7 +159,7 @@ class MainMenu(ctk.CTkFrame):
                 loading_window.destroy()
                 
             else:
-                self.loadDataLabel.configure(text=self.loadDataText)
+                self.load_data_label.configure(text=self.load_data_text)
                 loading_window.after(50, check_data_loaded) #keep checking after 50ms
                 
         check_data_loaded()
@@ -182,18 +182,18 @@ class MainMenu(ctk.CTkFrame):
         about_window.after_idle(about_window.attributes, '-topmost', False)
         
         # Load the image
-        aboutImg = Image.open(aboutImgpath)
+        about_img = Image.open(about_imgpath)
         # Resize the image to fit the window
-        aboutImg = aboutImg.resize((500,500))
-        aboutImg_tk = ImageTk.PhotoImage(aboutImg)
+        about_img = about_img.resize((500,500))
+        about_img_tk = ImageTk.PhotoImage(about_img)
         
         # Keep a reference to the image
-        about_window.aboutImg_tk = aboutImg_tk
+        about_window.about_img_tk = about_img_tk
         
-        aboutCanvas = tk.Canvas(master = about_window,
+        about_canvas = tk.Canvas(master = about_window,
                                 bd = 0,
                                 highlightthickness = 0,
                                 relief = 'ridge'
                                 )
-        aboutCanvas.create_image(0, 0, image=aboutImg_tk, anchor='nw')
-        aboutCanvas.pack(expand=True, fill='both')
+        about_canvas.create_image(0, 0, image=about_img_tk, anchor='nw')
+        about_canvas.pack(expand=True, fill='both')

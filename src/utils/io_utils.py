@@ -11,7 +11,7 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler
 
 
-def readData(raw_img_dir):
+def read_data(raw_img_dir):
     # Get the file extension
     # this allows the user to use plantcv for .raw format images and np.load for npy images.
     # with npy images the program does not support reference calibration
@@ -32,10 +32,10 @@ def readData(raw_img_dir):
         white_ref      = pcv.readimage(white_ref_path, mode='envi')
         dark_ref       = pcv.readimage(dark_ref_path, mode='envi')
         
-        calibrateddata = pcv.hyperspectral.calibrate(raw_data = raw_img, white_reference= white_ref, dark_reference= dark_ref)
-        calibrateddata = calibrateddata.array_data
+        calibrated_data = pcv.hyperspectral.calibrate(raw_data = raw_img, white_reference= white_ref, dark_reference= dark_ref)
+        calibrated_data = calibrated_data.array_data
         
-        return calibrateddata
+        return calibrated_data
 
     elif file_extension == '.npy':
         # Load the .npy file
@@ -46,7 +46,7 @@ def readData(raw_img_dir):
         print(f"Unsupported file type: {file_extension}")
         return None
     
-def saveDatatoComputer(numpyarray, filename):
+def save_datato_computer(numpyarray, filename):
     if filename.endswith('.csv'):
         # Flatten the array and save it as a CSV
         # flat_array = numpyarray.flatten()

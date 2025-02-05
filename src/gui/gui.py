@@ -11,8 +11,8 @@ from tkinter import messagebox
 
 import customtkinter as ctk
 
-from gui.home_window import HomeWindow
-from gui.main_menu import MainMenu  # Import the MainMenu subclass
+from gui.home_window import Home_window
+from gui.main_menu import Main_menu  # Import the Main_menu subclass
 from utils.config_parser import *
 from utils.data_preprocessing_utils import *
 from utils.variables_utils import *
@@ -39,24 +39,24 @@ class App(ctk.CTk):
             pass
 
          ## children to main window
-        self.menuBarFrame = ctk.CTkFrame(self)
-        self.workAreaFrame = ctk.CTkFrame(self)
+        self.menu_bar_frame = ctk.CTkFrame(self)
+        self.work_area_frame = ctk.CTkFrame(self)
 
-        self.menuBarFrame.place(x=0, y=0, relwidth = 1, relheight = 0.05)
-        self.workAreaFrame.place(rely = 0.05, y =0, relwidth =1, relheight =0.95)
+        self.menu_bar_frame.place(x=0, y=0, relwidth = 1, relheight = 0.05)
+        self.work_area_frame.place(rely = 0.05, y =0, relwidth =1, relheight =0.95)
 
         # set default values
-        self.band1Value = 150
-        self.band2Value = 150
+        self.band_1_value = 150
+        self.band_2_value = 150
 
         # Instantiate subclasses
-        self.main_menu = MainMenu(self)
-        self.home_window = HomeWindow(self)
+        self.main_menu = Main_menu(self)
+        self.home_window = Home_window(self)
 
     def run(self):
         self.mainloop()
 
-    def wavelengthsSlider_event(self,value=150):
+    def wavelengths_slider_event(self,value=150):
         if self.raw_img_dir == None or self.Dataloaded==False:
             pass
         else:
@@ -65,13 +65,13 @@ class App(ctk.CTk):
             self.tk_image = Image.fromarray(np.uint8(single_band_img))
 
             # updates the current slider value
-            self.wavelengthSliderCurrentValueLabel.configure(text= "Current Wavelength: " + str(int(value)))
+            self.wavelength_slider_current_value_label.configure(text= "Current Wavelength: " + str(int(value)))
             
             # destroy the left frame for new image
-            for widget in self.leftOriginalImgFrame.winfo_children():
+            for widget in self.left_original_Img_frame.winfo_children():
                 widget.destroy()
             
-            openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
+            openCanvas = ctk.CTkCanvas(self.left_original_Img_frame, 
                             bg = self.rgbValues(),
                             bd = 0,
                             highlightthickness = 0,
@@ -80,49 +80,49 @@ class App(ctk.CTk):
             print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             openCanvas.pack(expand =True, fill='both')        
             openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
-            openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image))
+            openCanvas.bind('<1>', lambda event: self.get_resized_image_coordinates(event, canvas = openCanvas, image = self.tk_image))
             # canvas.bind is being used to call the self.full_image function whenever the <Configure> event occurs. 
             # The <Configure> event is triggered whenever the widget changes size, so this code is saying “whenever the canvas changes size, 
             # run the self.full_image function”.
             print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
     
-    def band1ScatterSlider_event(self,value=150):
+    def band_1_scatter_slider_event(self,value=150):
         if self.raw_img_dir== None or self.Dataloaded==False:
             pass
         else:
-            self.band1ScatterSliderCurrentValueLabel.configure(text = "First Band: " + str(int(value)))
-            self.band1Value = int(value)
-            self.scatterPlotFigax.clear()
-            self.scatterPlotFigax.scatter(self.kmeansData[:, self.band1Value], 
-                                          self.kmeansData[:, self.band2Value], 
+            self.band_1_scatter_slider_current_value_label.configure(text = "First Band: " + str(int(value)))
+            self.band_1_value = int(value)
+            self.scatter_plot_fig_ax.clear()
+            self.scatter_plot_fig_ax.scatter(self.kmeansData[:, self.band_1_value], 
+                                          self.kmeansData[:, self.band_2_value], 
                                           c=self.kmeanslabels, s=10)
-            self.scatterPlotFigax.set_title("Scatter Plot")
-            self.scatterPlotFigax.set_xlabel("Band 1")
-            self.scatterPlotFigax.set_ylabel("Band 2")
-            self.scatterPlotFigax.figure.canvas.draw()
+            self.scatter_plot_fig_ax.set_title("Scatter Plot")
+            self.scatter_plot_fig_ax.set_xlabel("Band 1")
+            self.scatter_plot_fig_ax.set_ylabel("Band 2")
+            self.scatter_plot_fig_ax.figure.canvas.draw()
 
-    def band2ScatterSlider_event(self,value=150):
+    def band_2_scatter_slider_event(self,value=150):
             if self.raw_img_dir == None or self.Dataloaded==False:
                 pass
             else:
-                self.band2ScatterSliderCurrentValueLabel.configure(text= "Second Band: " + str(int(value)))
-                self.band2Value = int(value)
-                self.scatterPlotFigax.clear()
-                self.scatterPlotFigax.scatter(self.kmeansData[:, self.band1Value], 
-                                            self.kmeansData[:, self.band2Value], 
+                self.band_2_scatter_slider_current_value_label.configure(text= "Second Band: " + str(int(value)))
+                self.band_2_value = int(value)
+                self.scatter_plot_fig_ax.clear()
+                self.scatter_plot_fig_ax.scatter(self.kmeansData[:, self.band_1_value], 
+                                            self.kmeansData[:, self.band_2_value], 
                                             c=self.kmeanslabels, s=10)
-                self.scatterPlotFigax.set_title("Scatter Plot")
-                self.scatterPlotFigax.set_xlabel("Band 1")
-                self.scatterPlotFigax.set_ylabel("Band 2")
-                self.scatterPlotFigax.figure.canvas.draw()
+                self.scatter_plot_fig_ax.set_title("Scatter Plot")
+                self.scatter_plot_fig_ax.set_xlabel("Band 1")
+                self.scatter_plot_fig_ax.set_ylabel("Band 2")
+                self.scatter_plot_fig_ax.figure.canvas.draw()
 
     def rgbValues(self):
     
         if ctk.get_appearance_mode() == 'Light':
-            color = self.workAreaFrame.cget('fg_color')[0]
+            color = self.work_area_frame.cget('fg_color')[0]
         else:
-            color = self.workAreaFrame.cget('fg_color')[1]
+            color = self.work_area_frame.cget('fg_color')[1]
             
         if color == 'gray86':
             R = 219
@@ -165,7 +165,7 @@ class App(ctk.CTk):
         canvas.image = self.resized_tk
 
 
-    def getresizedImageCoordinates(self,event, canvas, image):
+    def get_resized_image_coordinates(self,event, canvas, image):
     
     
         # The event object contains the x and y coordinates of the mouse click
@@ -189,7 +189,7 @@ class App(ctk.CTk):
                 
                 scaled_imgX = round(imgX * x_scale_ratio)
                 scaled_imgY = round(imgY * y_scale_ratio)
-                self.wavelengthPlot(scaled_imgX, scaled_imgY)
+                self.wavelength_plot(scaled_imgX, scaled_imgY)
                 
         
         elif border_y == 0:
@@ -207,16 +207,16 @@ class App(ctk.CTk):
                 
                 scaled_imgX = round(imgX * x_scale_ratio)
                 scaled_imgY = round(imgY * y_scale_ratio)
-                self.wavelengthPlot(scaled_imgX, scaled_imgY)
+                self.wavelength_plot(scaled_imgX, scaled_imgY)
 
-    def wavelengthPlot(self,scaled_imgX,scaled_imgY):
+    def wavelength_plot(self,scaled_imgX,scaled_imgY):
         reflectance = self.spectral_array[int(scaled_imgY), int(scaled_imgX), :]
-        self.wavelengthPlotFigax.clear()
-        self.wavelengthPlotFigax.plot(np.arange(0, self.default_properties.get("noOfBandsEMR")), reflectance)
-        self.wavelengthPlotFigax.set_title("Wavelength Plot")
-        self.wavelengthPlotFigax.set_xlabel("Wavelength")
-        self.wavelengthPlotFigax.set_ylabel("Reflectance")
-        self.wavelengthPlotFigCanvas.draw()
+        self.wavelength_plot_fig_ax.clear()
+        self.wavelength_plot_fig_ax.plot(np.arange(0, self.default_properties.get("no_of_bands_EMR")), reflectance)
+        self.wavelength_plot_fig_ax.set_title("Wavelength Plot")
+        self.wavelength_plot_fig_ax.set_xlabel("Wavelength")
+        self.wavelength_plot_fig_ax.set_ylabel("Reflectance")
+        self.wavelength_plot_fig_canvas.draw()
 
     def show_psuedo_rgb(self):
             if self.spectral_array is None:
@@ -225,17 +225,17 @@ class App(ctk.CTk):
             rgb = create_pseudo_rgb(self.spectral_array)
             self.tk_image = Image.fromarray(np.uint8(rgb))
 
-            if hasattr(self, 'leftOriginalImgFrame') and self.leftOriginalImgFrame.winfo_exists():
+            if hasattr(self, 'left_original_Img_frame') and self.left_original_Img_frame.winfo_exists():
                 # Destroy all children of the left frame safely
-                for widget in self.leftOriginalImgFrame.winfo_children():
+                for widget in self.left_original_Img_frame.winfo_children():
                     if widget.winfo_exists():
                         widget.destroy()  # Destroy the widget if it exists
             
-                        openCanvas = ctk.CTkCanvas(self.leftOriginalImgFrame, 
+                        openCanvas = ctk.CTkCanvas(self.left_original_Img_frame, 
                                         bg = self.rgbValues(),
                                         bd = 0,
                                         highlightthickness = 0,
                                         relief = 'ridge')
                         openCanvas.pack(expand =True, fill='both')        
                         openCanvas.bind('<Configure>',lambda event: self.full_image(event, self.tk_image, canvas = openCanvas))
-                        openCanvas.bind('<1>', lambda event: self.getresizedImageCoordinates(event, canvas = openCanvas, image = self.tk_image))
+                        openCanvas.bind('<1>', lambda event: self.get_resized_image_coordinates(event, canvas = openCanvas, image = self.tk_image))
