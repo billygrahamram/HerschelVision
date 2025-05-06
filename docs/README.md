@@ -53,7 +53,7 @@ If you find HV application and code useful. Kindly cite the following papers in 
 1. Ram, B. G., Mettler, J., Howatt, K., Ostlie, M., & Sun, X. (2024). WeedCube: Proximal hyperspectral image dataset of crops and weeds for machine learning applications. Data in Brief, 56, 110837. https://doi.org/10.1016/j.dib.2024.110837
 
 
-2. Citation for application paper coming soon.
+2. Ram, B. G., Sunil, G. C., & Sun, X. (2025). Herschel vision: A hyperspectral image processing software for data preparation in machine learning pipelines. SoftwareX, 30, 102089.
 
 
 ## Future Updates
